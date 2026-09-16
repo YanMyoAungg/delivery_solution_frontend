@@ -1,16 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { components } from '@/types/api'
+import type { PermissionKey } from '@/types/permission'
 
 type User = components['schemas']['UserResponseDto']
 
 interface AuthState {
   token: string | null
   user: User | null
+  /** Server data — the exact key list the API returned, not narrowed. */
   permissions: string[]
   setSession: (user: User, permissions: string[], token: string) => void
   clearSession: () => void
-  hasPermission: (name: string) => boolean
+  hasPermission: (name: PermissionKey) => boolean
 }
 
 /**

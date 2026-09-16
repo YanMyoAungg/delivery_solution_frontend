@@ -1,17 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { http } from './client'
+import { http } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
 type Role = components['schemas']['RoleResponseDto']
+type CreateRoleResponse = components['schemas']['CreateRoleResponseDto']
+type UpdateRoleResponse = components['schemas']['UpdateRoleResponseDto']
 
 export interface CreateRoleBody {
   name: string
   description?: string | null
 }
 
+/** `PATCH /roles/:id` takes `{ description? }` only — `name` is immutable. */
 export interface UpdateRoleBody {
   description?: string | null
-  name?: string
 }
 
 export const rolesKeys = {
@@ -25,16 +27,18 @@ export async function fetchRoles(): Promise<Role[]> {
   return response.data
 }
 
-export async function createRole(body: CreateRoleBody): Promise<Role> {
-  const response = await http.post<Role>('/roles', body)
+export async function createRole(
+  body: CreateRoleBody,
+): Promise<CreateRoleResponse> {
+  const response = await http.post<CreateRoleResponse>('/roles', body)
   return response.data
 }
 
 export async function updateRole(
   id: string,
   body: UpdateRoleBody,
-): Promise<Role> {
-  const response = await http.patch<Role>(`/roles/${id}`, body)
+): Promise<UpdateRoleResponse> {
+  const response = await http.patch<UpdateRoleResponse>(`/roles/${id}`, body)
   return response.data
 }
 

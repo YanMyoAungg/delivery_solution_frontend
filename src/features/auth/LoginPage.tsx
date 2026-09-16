@@ -4,19 +4,12 @@ import { Eye, EyeOff, Loader2, Truck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@/lib/zodResolver'
 import { getApiErrorMessage } from '@/lib/api/client'
-import { login } from '@/lib/api/auth'
+import { login } from '@/features/auth/api'
+import { loginSchema, type LoginValues } from '@/features/auth/validations'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { z } from 'zod'
-
-const loginSchema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -28,7 +21,7 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema) as never,
+    resolver: zodResolver<LoginValues>(loginSchema),
     defaultValues: { email: '', password: '' },
   })
 

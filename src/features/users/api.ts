@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { http } from './client'
-import { rolesKeys } from './roles'
+import { http } from '@/lib/api/client'
+import { rolesKeys } from '@/features/roles/api'
 import type { components } from '@/types/api'
 
 type User = components['schemas']['UserResponseDto']

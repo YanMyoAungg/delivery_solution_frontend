@@ -5,8 +5,8 @@ import { useAuthStore } from '@/lib/store/auth.store'
 import { usePermission } from '@/lib/auth/gate'
 import { filterAssignableRoles } from '@/lib/auth/filterAssignableRoles'
 import { readApiError } from '@/lib/api/client'
-import { useRoles } from '@/lib/api/roles'
-import { useUsers, useDeleteUser } from '@/lib/api/users'
+import { useRoles } from '@/features/roles/api'
+import { useUsers, useDeleteUser, type UsersFilters } from './api'
 import { PAGE_SIZE } from '@/lib/constants'
 import { UserDialog } from './components/UserDialog'
 import { UsersTable } from './components/UsersTable'
@@ -20,14 +20,6 @@ import type { components } from '@/types/api'
 
 type User = components['schemas']['UserResponseDto']
 type UserStatus = components['schemas']['UserStatus']
-
-interface UsersFilters {
-  page: number
-  perPage: number
-  search?: string
-  roleId?: string
-  status?: UserStatus
-}
 
 export function UsersPage() {
   const [filters, setFilters] = useState<UsersFilters>({ page: 1, perPage: PAGE_SIZE })
@@ -140,7 +132,8 @@ export function UsersPage() {
         title="Delete user?"
         description={`This removes ${userToDelete?.name} (${userToDelete?.email}) permanently. This action cannot be undone.`}
         onConfirm={async () => {
-          await deleteUserMutation.mutateAsync(userToDelete!.id)
+          if (!userToDelete) return
+          await deleteUserMutation.mutateAsync(userToDelete.id)
           toast.success('User deleted')
         }}
       />

@@ -5,19 +5,20 @@ import {
   Settings,
   type LucideIcon,
 } from "lucide-react";
+import type { PermissionKey } from "@/types/permission";
 
 export interface NavItem {
   to: string;
   label: string;
   icon: LucideIcon;
   /** Route gate. Absent = always visible (Settings). */
-  permission?: string;
+  permission?: PermissionKey;
 }
 
 /** Single source of truth for sidebar + landing redirect. */
 export const NAV_ITEMS: NavItem[] = [
-  { to: "/users", label: "Users", icon: Users, permission: "users.list" },
-  { to: "/roles", label: "Roles", icon: UserCog, permission: "roles.list" },
+  { to: "/users", label: "Users", icon: Users, permission: "users.read" },
+  { to: "/roles", label: "Roles", icon: UserCog, permission: "roles.read" },
   {
     to: "/permissions",
     label: "Permissions",
@@ -32,7 +33,7 @@ export const NAV_ITEMS: NavItem[] = [
  * Settings (ungated) so a low-permission user never lands in a redirect loop.
  */
 export function firstAllowedPath(
-  hasPermission: (name: string) => boolean,
+  hasPermission: (name: PermissionKey) => boolean,
 ): string {
   for (const item of NAV_ITEMS) {
     if (!item.permission || hasPermission(item.permission)) return item.to;

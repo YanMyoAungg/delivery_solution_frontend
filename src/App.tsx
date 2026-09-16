@@ -50,10 +50,10 @@ function AppRoutes() {
       <Route element={<AuthBootstrap />}>
         <Route element={<RequireAuth />}>
           <Route element={<AppShell />}>
-            <Route element={<ProtectedRoute perm="users.list" />}>
+            <Route element={<ProtectedRoute perm="users.read" />}>
               <Route path="/users" element={<UsersPage />} />
             </Route>
-            <Route element={<ProtectedRoute perm="roles.list" />}>
+            <Route element={<ProtectedRoute perm="roles.read" />}>
               <Route path="/roles" element={<RolesPage />} />
             </Route>
             <Route element={<ProtectedRoute perm="permissions.read" />}>

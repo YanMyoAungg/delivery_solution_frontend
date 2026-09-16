@@ -8,7 +8,7 @@ import type { z } from "zod"
  * v4 schema through. Import from here, never from @hookform/resolvers.
  */
 export function zodResolver<TFieldValues extends FieldValues>(
-  schema: z.ZodTypeAny,
+  schema: z.ZodType<TFieldValues>,
 ): Resolver<TFieldValues> {
   return zodResolverRaw(schema as never) as unknown as Resolver<TFieldValues>
 }

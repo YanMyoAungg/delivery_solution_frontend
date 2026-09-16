@@ -1,9 +1,10 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '@/lib/store/auth.store'
+import type { PermissionKey } from '@/types/permission'
 
 /** Single source of permission truth. Mirrors backend grants (hasPermission). */
-export function usePermission(name: string): boolean {
+export function usePermission(name: PermissionKey): boolean {
   return useAuthStore((state) => state.hasPermission(name))
 }
 
@@ -11,7 +12,7 @@ export function Can({
   name,
   children,
 }: {
-  name: string
+  name: PermissionKey
   children: ReactNode
 }): ReactNode | null {
   const allowed = usePermission(name)
@@ -19,7 +20,7 @@ export function Can({
 }
 
 /** Route-level gate: redirect to /403 when the caller lacks the permission. */
-export function ProtectedRoute({ perm }: { perm: string }) {
+export function ProtectedRoute({ perm }: { perm: PermissionKey }) {
   const location = useLocation()
   const allowed = usePermission(perm)
   if (!allowed) {

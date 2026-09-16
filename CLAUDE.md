@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). This repo currently contains only `PLAN.md` — the first full vertical slice (login, user management CRUD, role-permission management) is to be built from it. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
+Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). The first vertical slice is built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
 
 **Locked decisions (user):**
 - **Vite + React SPA + TypeScript** — not Next.js (internal ops tool, pure JSON API, no SSR).
@@ -23,32 +23,33 @@ pnpm test                       # Vitest unit (**/*.spec.ts)
 pnpm test -- <path>             # single test file / filter
 ```
 
-Frontend testing quality gate mirrors backend: Vitest, mocked API, no containers, no e2e in this pass.
+**Do not write new tests in this repo** (standing user instruction). The pre-existing Vitest suite stays and must keep passing, but new work is gated by `pnpm lint` + `pnpm build` + manual smoke against `d_api`, never by a new spec file.
 
 ## API contract (from `d_api`, all `/api/v1`, Bearer JWT)
 
 Source of truth: **`GET /api/v1/docs-json`** — regenerate types with `pnpm codegen` (`openapi-typescript`, needs `d_api` running), never hand-wire shapes. Key shapes to be aware of:
 - `POST /auth/login` → `{ accessToken, user: UserResponseDto (id,name,email,phone,roleId,role,status,createdAt,updatedAt), permissions: string[] }`
 - `GET /auth/me` → `{ user, permissions }` (call on boot to restore/validate session); `POST /auth/change-password` → 204 (backend invalidates old tokens → frontend must force logout).
-- Users: `GET /users` (`search`,`roleId`,`status`,`page`,`perPage` → `{ data, meta }`), `POST /users`, `GET/PATCH/DELETE /users/:id` — gated `users.create/list/read/update/delete`.
-- Roles: `GET /roles` / `GET|PATCH|DELETE /roles/:id` / `POST /roles` — `{ id, name, description, isSystem, userCount }`, gated `roles.*`.
-- Permissions: `GET /permissions` (catalog grouped by derived `domain`), `POST /permissions`, `DELETE /permissions/:name`, `GET/PUT /permissions/roles/:roleId` (`PUT` body `{ permissions: string[] }`, replace-set) — gated `permissions.read/create/delete/manage`.
+- Users: `GET /users` (`search`,`roleId`,`status`,`page`,`perPage` → `{ data, meta }`), `POST /users`, `GET/PATCH/DELETE /users/:id` — gated `users.create/read/update/delete`.
+- Roles: `GET /roles` / `GET|PATCH|DELETE /roles/:id` / `POST /roles` — `{ id, name, description, isSystem, userCount }`, gated `roles.*` (`roles` has 4 actions: no `export`/`import`).
+- Permissions: `GET /permissions` (catalog grouped by `module`) gated `permissions.read`; `GET/PUT /permissions/roles/:roleId` (`PUT` body `{ permissions: string[] }`, replace-set) gated **`permissions.update`**. **The catalog is fixed and read-only from the frontend: `POST /permissions` and `DELETE /permissions/:name` are gone (404).**
 
 RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `users.role_id`, OWNER/ADMIN manage everything from the UI). UI must mirror backend rules:
-- `is_system` roles (OWNER): hold every permission, rows read-only/locked, zero grant rows.
+- **The grid is fixed**: 6 actions (`create, read, update, delete, export, import`) × 13 modules = 68 keys. `view ≡ read`, `edit ≡ update`; the key is `{module}.{action}`, lowercase. `src/types/permission.ts` mirrors it as a typed union so a backend rename is a build error, not a silent 403.
+- `is_system` roles (OWNER): hold every permission, rows read-only/locked, zero grant rows — so read the grid from `isSystem`, **never** from `GET /permissions/roles/:roleId` (that returns empty for OWNER).
 - ADMIN: manages OFFICER/created roles only; OWNER + ADMIN rows read-only; can grant only keys ADMIN itself holds; own role read-only.
-- role `name` immutable after create; delete-role blocked when `userCount > 0` (409 surfaces backend message); delete-key blocked (409) while granted.
-- Permission `name` format `domain.action`, lowercase. Offer only catalog keys in the grant editor (`PUT` of unknown keys 404s). A new key gates nothing until a route checks it — normal, show in a toast/help text.
+- role `name` immutable after create (`PATCH /roles/:id` takes `{ description? }` only); delete-role blocked when `userCount > 0` (409 surfaces backend message).
+- Offer only catalog keys in the grid (`PUT` of unknown keys 404s). A module × action the catalog doesn't define renders as an inert `·` cell. `PUT` replaces the whole set, so keys no longer in the catalog are pruned on save.
 
 ## Architecture (planned layout)
 
 - `src/lib/api/` — thin `http` wrapper (axios): attaches `Authorization: Bearer <token>`; on 401 clears session + redirects `/login` (skip loop on `/auth/login` and boot-time `/auth/me`). Request/response types come from `src/types/api.ts`, generated by `openapi-typescript` (see Types & Codegen).
-- `src/lib/store/` (zustand) — auth store: `token`, `user`, `permissions`, `setSession`, `clearSession`, `hasPermission(key)`; token persisted in `localStorage`.
-- `RequirePermission` hook + `<ProtectedRoute perm="users.list">`: route-level gate → 403 page; button/link-level gate hides element. Mirrors backend grants so UI hides what the API would 403.
+- `src/lib/store/` (zustand) — auth store: `token`, `user`, `permissions`, `setSession`, `clearSession`, `hasPermission(key: PermissionKey)`; token persisted in `localStorage`. `permissions` stays `string[]` (server data); `PermissionKey` is assignable to it.
+- `usePermission` hook + `<ProtectedRoute perm="users.read">`: route-level gate → 403 page; button/link-level gate hides element. Both take a `PermissionKey`, so a stale key fails to compile. Mirrors backend grants so UI hides what the API would 403.
 - `src/components/layout/AppShell` — sidebar (desktop ≥1024px, mobile collapsible drawer), topbar with role badge + dropdown (Change Password / Logout), `<Outlet/>`.
-- `src/features/auth|users|roles|permissions|settings/` — one folder per domain, each owning its pages/dialogs/forms.
+- `src/features/auth|users|roles|permissions|settings/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types — `permissions/` no longer has one: the grant grid has no form to validate), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
 - `src/config/` — app-level static config (e.g. `src/config/navigation.ts` — sidebar `NAV_ITEMS` + `firstAllowedPath`). NOT in `lib/`.
-- `src/types/` — `api.ts` (codegen). Permission keys are DB-driven; autocomplete is not needed at compile time.
+- `src/types/` — `api.ts` (codegen, read-only) + `permission.ts` (hand-written mirror of the backend's `permission-keys.ts`: `MODULE_ACTIONS`, `PermissionKey`, `ACTION_ORDER`). The catalog is fixed, so keys autocomplete at compile time; which cells *exist* still comes from the API response.
 - `src/components/ui/` — shadcn components: `button`, `input`, `label`, `card`, `dialog`, `table`, `dropdown-menu`, `badge`, `select`, `alert-dialog`, `sonner`, `skeleton`, `pagination`.
 
 ## Naming conventions (mandatory)
@@ -83,7 +84,7 @@ Layering: `ui-ux-pro-max` (usability/structure) → `taste` (visual polish) — 
 - React Query keyed on filter state (search/role/status/page) with refetch-on-mutation; pagination control wired to `meta`.
 - Create-dialog role Select must be restricted per the same hierarchy rule that restricts ADMIN (hide OWNER/ADMIN for ADMIN callers).
 - Keep contrast ≥4.5:1; focus rings visible; 375px viewport must not scroll horizontally. Defer dark mode.
-- Correctness bar mirrors `d_api`: `pnpm lint` + `pnpm test` green before calling work done.
+- Correctness bar: `pnpm lint` zero errors and `pnpm build` (tsc) green before calling work done, plus a manual smoke pass against `d_api`. No new spec files — see Tests above.
 
 ### Types & Codegen (do right after scaffold)
 
@@ -106,10 +107,10 @@ Layering: `ui-ux-pro-max` (usability/structure) → `taste` (visual polish) — 
 - **No `setState` inside `useEffect` keyed on a fresh-reference value** (`new Set()`, `new Array()`, `[]` via `?? default` when a React Query is disabled/error/`undefined`). This causes an infinite render loop ("Maximum update depth exceeded" → page freezes). Instead: derive the display value from the query response directly, or use the derive-or-own draft pattern (`useState<{roleId: string; set: Set<string>} | null>(null)`) — no effect, no loop.
 - `react-hooks/exhaustive-deps` is **error**, not warn. Never `eslint-disable` it — that's how the freeze shipped. If a dep is genuinely unsafe, isolate the value with `useRef` or restructure; do not suppress the rule.
 
-Full build order, API notes, and verification checklist live in `PLAN.md` — read it before starting any phase.
+
 ### React Query (mandatory)
 
 - **Cross-key invalidation**: a mutation must invalidate ALL query keys whose data it affects, not just its home domain. Example: user create/update/delete invalidate `usersKeys.all` **and** `rolesKeys.all` — `role.userCount` is derived from membership, so only invalidating users leaves RolesPage stale for 60s.
 - **QueryClient defaults** (`src/App.tsx`): `retry` only on 5xx or network error (`status == null || status >= 500`) — never retry a 403/404 (it will fail 3× more); default `staleTime: 10_000`.
 - **Per-query `staleTime` overrides** are still fine for stale-but-correct static catalogs (roles, permission catalog = 60s). Mutation invalidation bypasses `staleTime`, so edits still refetch instantly.
-- Grant editor: keep `staleTime` on `useRoleGrants`, and always reset the derive-or-own `draft` on role switch and after save.
+- Grant grid: keep `staleTime` on `useRoleGrants`, and always reset the derive-or-own `draft` on role switch and after save. A system (OWNER) role's checked set comes from `layoutDefinedKeys(buildGridLayout(catalog))`, never from the grants query.

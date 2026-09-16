@@ -1,10 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { http } from './client'
+import { http } from '@/lib/api/client'
+import { fetchMe } from '@/features/auth/api'
 import { useAuthStore } from '@/lib/store/auth.store'
 import type { components } from '@/types/api'
 
 type PermissionGroup = components['schemas']['PermissionGroupDto']
-type MeResponse = components['schemas']['MeResponseDto']
+/** `PUT` body — replaces the whole granted set for a role. */
+type UpdateRolePermissionsBody =
+  components['schemas']['UpdateRolePermissionsDto']
 
 export const permissionsKeys = {
   all: ['permissions'] as const,
@@ -19,18 +22,6 @@ export async function fetchPermissionCatalog(): Promise<PermissionGroup[]> {
   return response.data
 }
 
-export async function createPermission(body: {
-  name: string
-  description?: string | null
-}): Promise<unknown> {
-  const response = await http.post('/permissions', body)
-  return response.data
-}
-
-export async function deletePermission(name: string): Promise<void> {
-  await http.delete(`/permissions/${name}`)
-}
-
 export async function fetchRoleGrants(roleId: string): Promise<string[]> {
   const response = await http.get<string[]>(`/permissions/roles/${roleId}`)
   return response.data
@@ -40,11 +31,12 @@ export async function replaceRoleGrants(
   roleId: string,
   permissions: string[],
 ): Promise<string[]> {
-  const response = await http.put(`/permissions/roles/${roleId}`, {
-    permissions,
-  })
-  // Body typed `never` in codegen — cast is needed.
-  return response.data as string[]
+  const body: UpdateRolePermissionsBody = { permissions }
+  const response = await http.put<string[]>(
+    `/permissions/roles/${roleId}`,
+    body,
+  )
+  return response.data
 }
 
 /* ---- Hooks ---- */
@@ -55,26 +47,6 @@ export function usePermissionCatalog() {
     queryKey: permissionsKeys.catalog,
     queryFn: fetchPermissionCatalog,
     staleTime: 60_000,
-  })
-}
-
-export function useCreatePermission() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: createPermission,
-    onSuccess: () =>
-      // Prefix `.all` also invalidates grants — a deleted/added key must not
-      // linger in a role's granted set.
-      queryClient.invalidateQueries({ queryKey: permissionsKeys.all }),
-  })
-}
-
-export function useDeletePermission() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: deletePermission,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: permissionsKeys.all }),
   })
 }
 
@@ -99,8 +71,8 @@ export function useReplaceGrants() {
       // OWNER shortcircuits true in hasPermission, so skip the extra call.
       const { user, token, setSession } = useAuthStore.getState()
       if (!user || user.role === 'OWNER' || !token) return
-      const { data } = await http.get<MeResponse>('/auth/me')
-      setSession(data.user, data.permissions, token)
+      const { user: refreshedUser, permissions } = await fetchMe()
+      setSession(refreshedUser, permissions, token)
     },
   })
 }

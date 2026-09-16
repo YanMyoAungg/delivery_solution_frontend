@@ -1,10 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-import { http } from '@/lib/api/client'
+import { fetchMe } from '@/features/auth/api'
 import { useAuthStore } from '@/lib/store/auth.store'
-import type { components } from '@/types/api'
-
-type MeResponse = components['schemas']['MeResponseDto']
 
 /**
  * Restores a persisted session on boot: if a token exists, validate it via
@@ -22,11 +19,10 @@ export function AuthBootstrap() {
   useEffect(() => {
     if (!token || hasUser) return
     let cancelled = false
-    http
-      .get<MeResponse>('/auth/me')
-      .then((response) => {
+    fetchMe()
+      .then(({ user: fetchedUser, permissions }) => {
         if (!cancelled) {
-          setSession(response.data.user, response.data.permissions, token)
+          setSession(fetchedUser, permissions, token)
         }
       })
       .catch(() => {

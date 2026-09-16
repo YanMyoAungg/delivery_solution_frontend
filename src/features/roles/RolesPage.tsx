@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, Lock } from 'lucide-react'
-import { cn } from 'cn'
 import { usePermission } from '@/lib/auth/gate'
 import { useAuthStore } from '@/lib/store/auth.store'
-import { useRoles, useDeleteRole } from '@/lib/api/roles'
+import { useRoles, useDeleteRole } from './api'
 import { getApiErrorMessage } from '@/lib/api/client'
 import { toNullableString } from '@/lib/nullable'
 import { RoleDialog } from './components/RoleDialog'
@@ -92,7 +91,10 @@ export function RolesPage() {
                           </Button>
                           <Button variant="ghost" size="icon-sm" aria-label={`Delete ${role.name}`} disabled={locked || role.userCount > 0}
                             onClick={() => setRoleToDelete(role)}>
-                            <Trash2 className={cn('size-3.5', role.userCount > 0 && !locked ? 'text-destructive' : 'text-muted-foreground')} />
+                            {/* Always red, like the delete icon in UsersTable: a disabled
+                                button already dims itself via disabled:opacity-50, so a
+                                second per-state color here double-encodes the same thing. */}
+                            <Trash2 className="size-3.5 text-destructive" />
                           </Button>
                         </div>
                       </TableCell>
@@ -118,7 +120,8 @@ export function RolesPage() {
         title="Delete role?"
         description={`This permanently removes the ${roleToDelete?.name} role.`}
         onConfirm={async () => {
-          await deleteRoleMutation.mutateAsync(roleToDelete!.id)
+          if (!roleToDelete) return
+          await deleteRoleMutation.mutateAsync(roleToDelete.id)
           toast.success('Role deleted')
         }}
       />

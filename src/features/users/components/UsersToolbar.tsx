@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -6,6 +7,17 @@ import type { components } from '@/types/api'
 
 type UserStatus = components['schemas']['UserStatus']
 type Role = components['schemas']['RoleResponseDto']
+
+/**
+ * Base UI's `Select.Value` renders the raw value unless `Select.Root` is given
+ * an `items` map to resolve labels from — the item children do not reach the
+ * trigger. Static, so a module-level constant keeps the reference stable.
+ */
+const STATUS_FILTER_ITEMS: Record<string, string> = {
+  ALL: 'All statuses',
+  ACTIVE: 'Active',
+  INACTIVE: 'Inactive',
+}
 
 interface UsersToolbarProps {
   searchInput: string
@@ -35,6 +47,16 @@ export function UsersToolbar({
   onApply,
   onReset,
 }: UsersToolbarProps) {
+  // Keyed by id, so the label resolves for any role the caller passes in.
+  const roleFilterItems = useMemo(
+    () =>
+      Object.fromEntries([
+        ['ALL', 'All roles'],
+        ...assignableRoles.map((role) => [role.id, role.name]),
+      ]),
+    [assignableRoles],
+  )
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="relative">
@@ -49,7 +71,13 @@ export function UsersToolbar({
         />
       </div>
 
-      <Select value={statusFilter} onValueChange={(v) => v && onStatusFilterChange(v as 'ALL' | UserStatus)}>
+      <Select
+        items={STATUS_FILTER_ITEMS}
+        value={statusFilter}
+        onValueChange={(value) => {
+          if (value) onStatusFilterChange(value as 'ALL' | UserStatus)
+        }}
+      >
         <SelectTrigger aria-label="Filter by status" className="w-36">
           <SelectValue />
         </SelectTrigger>
@@ -60,14 +88,14 @@ export function UsersToolbar({
         </SelectContent>
       </Select>
 
-      <Select value={roleFilter} onValueChange={(v) => v && onRoleFilterChange(v)}>
+      <Select items={roleFilterItems} value={roleFilter} onValueChange={(value) => value && onRoleFilterChange(value)}>
         <SelectTrigger aria-label="Filter by role" className="w-40">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="ALL">All roles</SelectItem>
-          {assignableRoles.map((r) => (
-            <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+          {assignableRoles.map((role) => (
+            <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
           ))}
         </SelectContent>
       </Select>

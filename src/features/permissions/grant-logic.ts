@@ -1,7 +1,7 @@
 /** Pure grant-editor logic — extracted so it's testable without the component. */
 
 export interface PermissionGroupInput {
-  domain: string
+  module: string
   permissions: string[]
 }
 
@@ -52,6 +52,45 @@ export function toggleKey(set: Set<string>, key: string): Set<string> {
     next.add(key)
   }
   return next
+}
+
+/** Add or remove every key in `keys`, returning a NEW set. Callers pass the
+ * keys the catalog actually defines, so the grid's "All" toggle can never
+ * introduce an unknown key. */
+export function toggleAllKeys(
+  keys: string[],
+  set: Set<string>,
+  target: boolean,
+): Set<string> {
+  const next = new Set(set)
+  for (const key of keys) {
+    if (target) next.add(key)
+    else next.delete(key)
+  }
+  return next
+}
+
+export interface GrantSummary {
+  granted: number
+  total: number
+  isAllGranted: boolean
+  isPartiallyGranted: boolean
+}
+
+/** Bulk state over the catalog's defined keys — drives the select-all control
+ * and the running count. `isPartiallyGranted` is what makes the control
+ * tri-state, so "some granted" never renders as fully on or fully off. */
+export function summarizeGrants(
+  keys: string[],
+  checked: Set<string>,
+): GrantSummary {
+  const granted = keys.filter((key) => checked.has(key)).length
+  return {
+    granted,
+    total: keys.length,
+    isAllGranted: keys.length > 0 && granted === keys.length,
+    isPartiallyGranted: granted > 0 && granted < keys.length,
+  }
 }
 
 /** Derive-or-own: use the draft when it matches the selected role, else server data. */

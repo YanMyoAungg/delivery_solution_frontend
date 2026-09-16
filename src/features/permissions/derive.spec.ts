@@ -7,39 +7,39 @@ import {
 
 describe('permissions derive', () => {
   const CATALOG: PermissionGroupInput[] = [
-    { domain: 'users', permissions: ['users.list', 'users.create'] },
-    { domain: 'roles', permissions: ['roles.list', 'roles.create'] },
+    { module: 'users', permissions: ['users.read', 'users.create'] },
+    { module: 'roles', permissions: ['roles.read', 'roles.create'] },
   ]
 
   it('builds a checked set from granted keys', () => {
-    const set = buildCheckedSet(['users.list', 'roles.list'], CATALOG)
-    expect(set.has('users.list')).toBe(true)
-    expect(set.has('roles.list')).toBe(true)
+    const set = buildCheckedSet(['users.read', 'roles.read'], CATALOG)
+    expect(set.has('users.read')).toBe(true)
+    expect(set.has('roles.read')).toBe(true)
     expect(set.size).toBe(2)
   })
 
   it('drops granted keys missing from the catalog', () => {
-    const set = buildCheckedSet(['users.list', 'orders.cancel'], CATALOG)
+    const set = buildCheckedSet(['users.read', 'orders.cancel'], CATALOG)
     expect(set.has('orders.cancel')).toBe(false)
     expect(set.size).toBe(1)
   })
 
   it('no changes when checked matches granted', () => {
-    const set = buildCheckedSet(['users.list'], CATALOG)
-    expect(isDirtyCatalogAware(set, ['users.list'], CATALOG)).toBe(false)
+    const set = buildCheckedSet(['users.read'], CATALOG)
+    expect(isDirtyCatalogAware(set, ['users.read'], CATALOG)).toBe(false)
   })
 
   it('dirty when a key is toggled on', () => {
     const set = buildCheckedSet([], CATALOG)
-    set.add('users.list')
+    set.add('users.read')
     expect(isDirtyCatalogAware(set, [], CATALOG)).toBe(true)
   })
 
   it('dirty when a key is toggled off', () => {
-    const set = buildCheckedSet(['users.list', 'users.create'], CATALOG)
-    set.delete('users.list')
+    const set = buildCheckedSet(['users.read', 'users.create'], CATALOG)
+    set.delete('users.read')
     expect(
-      isDirtyCatalogAware(set, ['users.list', 'users.create'], CATALOG),
+      isDirtyCatalogAware(set, ['users.read', 'users.create'], CATALOG),
     ).toBe(true)
   })
 })

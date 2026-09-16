@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createUserSchema, updateUserSchema } from './users'
+import { createUserSchema, updateUserSchema } from './validations'
 
 describe('createUserSchema', () => {
   const valid = { name: 'John', email: 'john@delivery.local', phone: null, roleId: 'r1', password: 'Password1' }

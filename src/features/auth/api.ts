@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { http } from './client'
+import { http } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
 type LoginResponse = components['schemas']['LoginResponseDto']

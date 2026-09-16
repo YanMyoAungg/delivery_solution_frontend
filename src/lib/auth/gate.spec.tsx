@@ -24,13 +24,13 @@ describe('Can', () => {
   beforeEach(() => {
     localStorage.clear()
     useAuthStore.getState().clearSession()
-    useAuthStore.getState().setSession(OFFICER, ['users.list'], 'abc')
+    useAuthStore.getState().setSession(OFFICER, ['users.read'], 'abc')
   })
 
   it('renders children when the permission is held', () => {
     render(
       <Bootstrapped>
-        <Can name="users.list">
+        <Can name="users.read">
           <span>visible</span>
         </Can>
       </Bootstrapped>,
@@ -61,7 +61,7 @@ describe('ProtectedRoute', () => {
     render(
       <MemoryRouter initialEntries={['/secret']}>
         <Routes>
-          <Route element={<ProtectedRoute perm="roles.list" />}>
+          <Route element={<ProtectedRoute perm="roles.read" />}>
             <Route path="/secret" element={<span>secret</span>} />
           </Route>
           <Route path="/403" element={<span>forbidden</span>} />
@@ -73,11 +73,11 @@ describe('ProtectedRoute', () => {
   })
 
   it('renders children when the permission is held', () => {
-    useAuthStore.getState().setSession(OFFICER, ['roles.list'], 'abc')
+    useAuthStore.getState().setSession(OFFICER, ['roles.read'], 'abc')
     render(
       <MemoryRouter initialEntries={['/secret']}>
         <Routes>
-          <Route element={<ProtectedRoute perm="roles.list" />}>
+          <Route element={<ProtectedRoute perm="roles.read" />}>
             <Route path="/secret" element={<span>secret</span>} />
           </Route>
           <Route path="/403" element={<span>forbidden</span>} />

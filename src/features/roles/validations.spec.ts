@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRoleSchema } from './roles'
+import { createRoleSchema } from './validations'
 
 describe('createRoleSchema', () => {
   it('accepts an uppercase role name', () => {

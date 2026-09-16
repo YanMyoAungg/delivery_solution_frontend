@@ -4,31 +4,17 @@ import { toast } from 'sonner'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@/lib/zodResolver'
-import { changePassword } from '@/lib/api/auth'
+import { changePassword } from '@/features/auth/api'
+import {
+  changePasswordSchema,
+  type ChangePasswordValues,
+} from '@/features/auth/validations'
 import { getApiErrorMessage } from '@/lib/api/client'
 import { useAuthStore } from '@/lib/store/auth.store'
-import { MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { z } from 'zod'
-
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z
-      .string()
-      .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
-      .max(MAX_PASSWORD_LENGTH, `Password must be at most ${MAX_PASSWORD_LENGTH} characters`),
-    confirmPassword: z.string().min(1, 'Please confirm your new password'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  })
-
-type ChangePasswordValues = z.infer<typeof changePasswordSchema>
 
 export function ChangePasswordPage() {
   const navigate = useNavigate()
@@ -38,7 +24,7 @@ export function ChangePasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ChangePasswordValues>({
-    resolver: zodResolver(changePasswordSchema) as never,
+    resolver: zodResolver<ChangePasswordValues>(changePasswordSchema),
     defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   })
   const { formState: { errors } } = form

@@ -115,29 +115,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List the permission catalog grouped by domain */
+        /** List the fixed permission catalog grouped by module */
         get: operations["PermissionsController_catalog_v1"];
         put?: never;
-        /** Create a new permission in the catalog */
-        post: operations["PermissionsController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/permissions/{name}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
         post?: never;
-        /** Delete a permission (blocked if granted) */
-        delete: operations["PermissionsController_remove_v1"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -223,9 +205,9 @@ export interface components {
             dependencies: Record<string, never>;
         };
         LoginDto: {
-            /** @example owner@delivery.local */
+            /** @example owner@mail.com */
             email: string;
-            /** @example owner1234 */
+            /** @example Password1234 */
             password: string;
         };
         /** @enum {string} */
@@ -235,7 +217,7 @@ export interface components {
             id: string;
             /** @example System Owner */
             name: string;
-            /** @example owner@delivery.local */
+            /** @example owner@mail.com */
             email: string;
             /** @example 09123456789 */
             phone: Record<string, never> | null;
@@ -314,20 +296,24 @@ export interface components {
         };
         PermissionGroupDto: {
             /** @example users */
-            domain: string;
+            module: string;
             /**
              * @example [
-             *       "users.list",
+             *       "users.create",
              *       "users.read"
              *     ]
              */
             permissions: string[];
         };
-        CreatedPermissionDto: {
-            /** @example shops.manage */
-            name: string;
-            /** @example shops */
-            domain: string;
+        UpdateRolePermissionsDto: {
+            /**
+             * @description Permission keys to grant (replaces the set)
+             * @example [
+             *       "users.create",
+             *       "users.read"
+             *     ]
+             */
+            permissions: string[];
         };
         RoleResponseDto: {
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
@@ -340,6 +326,31 @@ export interface components {
             isSystem: boolean;
             /** @example 3 */
             userCount: number;
+        };
+        CreateRoleDto: {
+            /**
+             * @description Uppercase role name, 2-32 chars, letters/digits/underscore
+             * @example MANAGER
+             */
+            name: string;
+            /** @example Operations manager */
+            description?: Record<string, never>;
+        };
+        CreateRoleResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example MANAGER */
+            name: string;
+            /** @example false */
+            isSystem: boolean;
+        };
+        UpdateRoleDto: {
+            /** @example Operations manager */
+            description?: Record<string, never>;
+        };
+        UpdateRoleResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
         };
     };
     responses: never;
@@ -566,44 +577,6 @@ export interface operations {
             };
         };
     };
-    PermissionsController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CreatedPermissionDto"];
-                };
-            };
-        };
-    };
-    PermissionsController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                name: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     PermissionsController_grants_v1: {
         parameters: {
             query?: never;
@@ -620,7 +593,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string[];
+                };
             };
         };
     };
@@ -633,14 +608,20 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRolePermissionsDto"];
+            };
+        };
         responses: {
             /** @description The granted keys after the update */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string[];
+                };
             };
         };
     };
@@ -670,14 +651,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleDto"];
+            };
+        };
         responses: {
-            /** @description Created role */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CreateRoleResponseDto"];
+                };
             };
         };
     };
@@ -730,14 +716,19 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleDto"];
+            };
+        };
         responses: {
-            /** @description Updated role id */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UpdateRoleResponseDto"];
+                };
             };
         };
     };
