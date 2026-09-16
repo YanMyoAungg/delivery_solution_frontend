@@ -1,0 +1,84 @@
+- generic [ref=f6e2]:
+  - generic [ref=f6e3]:
+    - complementary [ref=f6e4]:
+      - generic [ref=f6e5]: Delivery Solution
+      - navigation [ref=f6e7]:
+        - link "Users" [ref=f6e8] [cursor=pointer]:
+          - /url: /users
+        - link "Roles" [ref=f6e14] [cursor=pointer]:
+          - /url: /roles
+        - link "Permissions" [ref=f6e27] [cursor=pointer]:
+          - /url: /permissions
+        - link "Settings" [ref=f6e31] [cursor=pointer]:
+          - /url: /settings/password
+    - generic [ref=f6e35]:
+      - banner [ref=f6e36]:
+        - generic [ref=f6e37]:
+          - generic [ref=f6e38]:
+            - generic [ref=f6e39]: System Owner
+            - generic [ref=f6e40]: OWNER
+          - button "Account menu" [ref=f6e41]
+      - main [ref=f6e45]:
+        - generic [ref=f6e46]:
+          - generic [ref=f6e47]:
+            - generic [ref=f6e48]:
+              - heading "Users" [level=1] [ref=f6e49]
+              - paragraph [ref=f6e50]: Manage team members and their accounts.
+            - button "New user" [ref=f6e51]
+          - generic [ref=f6e52]:
+            - textbox "Search users" [ref=f6e57]:
+              - /placeholder: Search name, email, phone...
+            - combobox "Filter by status" [ref=f6e58]:
+              - generic [ref=f6e59]: ALL
+              - img [aria-hidden]: ▼
+            - textbox [aria-hidden] [ref=f6e60]: ALL
+            - combobox "Filter by role" [ref=f6e61]:
+              - generic [ref=f6e62]: ALL
+              - img [aria-hidden]: ▼
+            - textbox [aria-hidden] [ref=f6e63]: ALL
+            - button "Apply" [ref=f6e64]
+          - table [ref=f6e74]:
+            - rowgroup [ref=f6e75]:
+              - row [ref=f6e76]:
+                - columnheader "Name" [ref=f6e77]
+                - columnheader "Email" [ref=f6e78]
+                - columnheader "Phone" [ref=f6e79]
+                - columnheader "Role" [ref=f6e80]
+                - columnheader "Status" [ref=f6e81]
+                - columnheader "Created" [ref=f6e82]
+                - columnheader "Actions" [ref=f6e83]
+            - rowgroup [ref=f6e84]:
+              - row [ref=f6e85]:
+                - cell "System Owner" [ref=f6e86]
+                - cell "owner@mail.com" [ref=f6e87]
+                - cell "—" [ref=f6e88]
+                - cell "OWNER" [ref=f6e89]
+                - cell "ACTIVE" [ref=f6e91]
+                - cell "Sep 15, 2026" [ref=f6e93]
+                - cell [ref=f6e94]:
+                  - generic [ref=f6e95]:
+                    - button "Edit System Owner" [disabled]
+                    - button "Delete System Owner" [disabled]
+              - row [ref=f6e96]:
+                - cell "Admin 1" [ref=f6e97]
+                - cell "admin1@mail.com" [ref=f6e98]
+                - cell "—" [ref=f6e99]
+                - cell "ADMIN" [ref=f6e100]
+                - cell "ACTIVE" [ref=f6e102]
+                - cell "Sep 15, 2026" [ref=f6e104]
+                - cell [ref=f6e105]:
+                  - generic [ref=f6e106]:
+                    - button "Edit Admin 1" [ref=f6e107]
+                    - button "Delete Admin 1" [ref=f6e108]
+              - row [ref=f6e109]:
+                - cell "Admin 2" [ref=f6e110]
+                - cell "admin2@mail.com" [ref=f6e111]
+                - cell "—" [ref=f6e112]
+                - cell "ADMIN" [ref=f6e113]
+                - cell "ACTIVE" [ref=f6e115]
+                - cell "Sep 15, 2026" [ref=f6e117]
+                - cell [ref=f6e118]:
+                  - generic [ref=f6e119]:
+                    - button "Edit Admin 2" [ref=f6e120]
+                    - button "Delete Admin 2" [ref=f6e121]
+  - region "Notifications alt+T"

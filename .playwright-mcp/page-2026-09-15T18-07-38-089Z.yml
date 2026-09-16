@@ -1,0 +1,43 @@
+- generic [ref=f5e2]:
+  - generic [ref=f5e3]:
+    - complementary [ref=f5e4]:
+      - generic [ref=f5e5]: Delivery Solution
+      - navigation [ref=f5e7]:
+        - link "Users" [ref=f5e8] [cursor=pointer]:
+          - /url: /users
+        - link "Roles" [ref=f5e14] [cursor=pointer]:
+          - /url: /roles
+        - link "Permissions" [ref=f5e27] [cursor=pointer]:
+          - /url: /permissions
+        - link "Settings" [ref=f5e31] [cursor=pointer]:
+          - /url: /settings/password
+    - generic [ref=f5e35]:
+      - banner [ref=f5e36]:
+        - generic [ref=f5e37]:
+          - generic [ref=f5e38]:
+            - generic [ref=f5e39]: System Owner
+            - generic [ref=f5e40]: OWNER
+          - button "Account menu" [active] [ref=f5e41]
+      - main [ref=f5e45]:
+        - generic [ref=f5e145]:
+          - generic [ref=f5e146]:
+            - generic [ref=f5e147]: Change password
+            - generic [ref=f5e148]: You'll be signed out and asked to sign in again with your new password.
+          - generic [ref=f5e150]:
+            - generic [ref=f5e151]:
+              - generic [ref=f5e152]: Current password
+              - generic [ref=f5e153]:
+                - textbox "Current password" [ref=f5e154]
+                - button "Show passwords" [ref=f5e155]
+            - generic [ref=f5e159]:
+              - generic [ref=f5e160]: New password
+              - generic [ref=f5e161]:
+                - textbox "New password" [ref=f5e162]
+                - button "Show passwords" [ref=f5e163]
+            - generic [ref=f5e167]:
+              - generic [ref=f5e168]: Confirm new password
+              - generic [ref=f5e169]:
+                - textbox "Confirm new password" [ref=f5e170]
+                - button "Show passwords" [ref=f5e171]
+            - button "Change password" [ref=f5e175]
+  - region "Notifications alt+T"

@@ -1,0 +1,17 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - heading "Delivery Solution" [level=1] [ref=e12]
+      - paragraph [ref=e13]: Sign in to the operations console
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]: Email
+        - textbox "Email" [ref=e17]:
+          - /placeholder: owner@delivery.local
+      - generic [ref=e18]:
+        - generic [ref=e19]: Password
+        - generic [ref=e20]:
+          - textbox "Password" [ref=e21]
+          - button "Show password" [ref=e22]
+      - button "Sign in" [ref=e26]
+  - region "Notifications alt+T"

@@ -1,0 +1,2 @@
+- [Refactor progress](refactor-progress.md) — d_frontend mid-refactor checkpoint, next is derive.spec + Phase 2 Users
+- [NavBar white-screen fix](navbar-white-screen-fix.md) — Base UI MenuGroupContext, unverified, re-test after restart
