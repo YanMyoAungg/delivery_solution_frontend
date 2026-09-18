@@ -3,6 +3,12 @@ import {
   UserCog,
   ShieldCheck,
   Settings,
+  Store,
+  Contact,
+  Bike,
+  Package,
+  ClipboardList,
+  Route,
   type LucideIcon,
 } from "lucide-react";
 import type { PermissionKey } from "@/types/permission";
@@ -25,6 +31,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: ShieldCheck,
     permission: "permissions.read",
   },
+  { to: "/shops", label: "Shops", icon: Store, permission: "shops.read" },
+  { to: "/customers", label: "Customers", icon: Contact, permission: "customers.read" },
+  { to: "/riders", label: "Riders", icon: Bike, permission: "riders.read" },
+  { to: "/orders", label: "Orders", icon: Package, permission: "orders.read" },
+  { to: "/pickups", label: "Pickups", icon: ClipboardList, permission: "pickups.read" },
+  { to: "/deliveries", label: "Deliveries", icon: Route, permission: "deliveries.read" },
   { to: "/settings/password", label: "Settings", icon: Settings },
 ];
 
