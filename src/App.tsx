@@ -14,6 +14,12 @@ import { PermissionsPage } from '@/features/permissions/PermissionsPage'
 import { ChangePasswordPage } from '@/features/settings/ChangePasswordPage'
 import { ForbiddenPage } from '@/features/errors/ForbiddenPage'
 import { NotFoundPage } from '@/features/errors/NotFoundPage'
+import { ShopsPage } from '@/features/shops/ShopsPage'
+import { CustomersPage } from '@/features/customers/CustomersPage'
+import { RidersPage } from '@/features/riders/RidersPage'
+import { OrdersPage } from '@/features/orders/OrdersPage'
+import { PickupsPage } from '@/features/pickups/PickupsPage'
+import { DeliveriesPage } from '@/features/deliveries/DeliveriesPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +65,12 @@ function AppRoutes() {
             <Route element={<ProtectedRoute perm="permissions.read" />}>
               <Route path="/permissions" element={<PermissionsPage />} />
             </Route>
+            <Route element={<ProtectedRoute perm="shops.read" />}><Route path="/shops" element={<ShopsPage />} /></Route>
+            <Route element={<ProtectedRoute perm="customers.read" />}><Route path="/customers" element={<CustomersPage />} /></Route>
+            <Route element={<ProtectedRoute perm="riders.read" />}><Route path="/riders" element={<RidersPage />} /></Route>
+            <Route element={<ProtectedRoute perm="orders.read" />}><Route path="/orders" element={<OrdersPage />} /></Route>
+            <Route element={<ProtectedRoute perm="pickups.read" />}><Route path="/pickups" element={<PickupsPage />} /></Route>
+            <Route element={<ProtectedRoute perm="deliveries.read" />}><Route path="/deliveries" element={<DeliveriesPage />} /></Route>
             <Route path="/settings/password" element={<ChangePasswordPage />} />
           </Route>
         </Route>
