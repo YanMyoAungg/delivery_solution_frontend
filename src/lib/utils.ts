@@ -11,8 +11,8 @@ export function formatDate(value: string): string {
   }).format(new Date(value))
 }
 
-/** Badge classes for a user status: green for ACTIVE, amber for INACTIVE. */
-export function statusBadgeClass(status: UserStatus): string {
+/** Badge classes for a user/rider status: green for ACTIVE, amber for INACTIVE. */
+export function statusBadgeClass(status: UserStatus | 'ACTIVE' | 'INACTIVE'): string {
   if (status === 'ACTIVE') return 'bg-success/15 text-emerald-700'
   return 'bg-warning/15 text-amber-700'
 }

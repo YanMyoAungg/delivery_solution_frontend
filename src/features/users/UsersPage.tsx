@@ -59,6 +59,11 @@ export function UsersPage() {
   }
 
   const hasFilters = !!(filters.search || filters.roleId || filters.status)
+  // Apply is enabled only when the local draft differs from the committed filters.
+  const hasPendingChanges =
+    (searchInput || undefined) !== filters.search ||
+    (roleFilter === 'ALL' ? undefined : roleFilter) !== filters.roleId ||
+    (statusFilter === 'ALL' ? undefined : statusFilter) !== filters.status
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,6 +85,7 @@ export function UsersPage() {
         roleFilter={roleFilter}
         assignableRoles={assignableRoles}
         hasFilters={hasFilters}
+        hasPendingChanges={hasPendingChanges}
         onSearchInputChange={setSearchInput}
         onSearchSubmit={applyFilters}
         onStatusFilterChange={setStatusFilter}

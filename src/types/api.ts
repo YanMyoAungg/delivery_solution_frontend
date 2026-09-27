@@ -180,6 +180,117 @@ export interface paths {
         patch: operations["RolesController_update_v1"];
         trace?: never;
     };
+    "/api/v1/shops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List shops with search, filters and pagination */
+        get: operations["ShopsController_list_v1"];
+        put?: never;
+        /** Create a new shop */
+        post: operations["ShopsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a shop by id */
+        get: operations["ShopsController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a shop */
+        delete: operations["ShopsController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a shop */
+        patch: operations["ShopsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List customers with search and pagination */
+        get: operations["CustomersController_list_v1"];
+        put?: never;
+        /** Create a new customer */
+        post: operations["CustomersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a customer by id */
+        get: operations["CustomersController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a customer */
+        delete: operations["CustomersController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a customer */
+        patch: operations["CustomersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/riders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List riders with search, filters and pagination */
+        get: operations["RidersController_list_v1"];
+        put?: never;
+        /** Create a rider — creates a RIDER-role user row and the rider profile in one transaction */
+        post: operations["RidersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a rider by id (id = the backing user id) */
+        get: operations["RidersController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a rider and its backing user row */
+        delete: operations["RidersController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update rider profile and/or whitelisted user fields (name, phone, status) */
+        patch: operations["RidersController_update_v1"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -351,6 +462,173 @@ export interface components {
         UpdateRoleResponseDto: {
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             id: string;
+        };
+        /** @enum {string} */
+        ShopChannelType: "VIBER" | "TELEGRAM";
+        ShopResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example Yangon Fresh Market */
+            name: string;
+            /** @example 09123456789 */
+            phone: Record<string, never> | null;
+            /** @example No. 12, Bogyoke Road, Yangon */
+            address: Record<string, never> | null;
+            /** @example Preferred delivery contact: shop manager */
+            notes: Record<string, never> | null;
+            channelType: components["schemas"]["ShopChannelType"];
+            /** @example Yangon Fresh Market Group */
+            channelName: string;
+            /** @example 2026-09-17T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-17T10:00:00.000Z */
+            updatedAt: string;
+        };
+        ShopListResponseDto: {
+            data: components["schemas"]["ShopResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
+        CreateShopDto: {
+            /** @example Yangon Fresh Market */
+            name: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 12, Bogyoke Road, Yangon */
+            address: Record<string, never> | null;
+            /** @example Preferred delivery contact: shop manager */
+            notes: Record<string, never> | null;
+            channelType: components["schemas"]["ShopChannelType"];
+            /** @example Yangon Fresh Market Group */
+            channelName: string;
+        };
+        UpdateShopDto: {
+            /** @example Yangon Fresh Market Updated */
+            name?: string;
+            /** @example 09876543210 */
+            phone?: Record<string, never> | null;
+            /** @example No. 34, Merchant Street, Yangon */
+            address?: Record<string, never> | null;
+            /** @example Updated points of contact */
+            notes?: Record<string, never> | null;
+            channelType?: components["schemas"]["ShopChannelType"];
+            /** @example Yangon Fresh Market Group */
+            channelName?: string;
+        };
+        CustomerResponseDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            phone?: Record<string, never>;
+            address?: Record<string, never>;
+            notes?: Record<string, never>;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CustomerListResponseDto: {
+            data: components["schemas"]["CustomerResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
+        CreateCustomerDto: {
+            /** @description Customer full name */
+            name: string;
+            phone?: string;
+            address?: string;
+            notes?: string;
+        };
+        UpdateCustomerDto: {
+            /** @description Customer full name */
+            name?: string;
+            phone?: string;
+            address?: string;
+            notes?: string;
+        };
+        /** @enum {string} */
+        RiderVehicleType: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
+        RiderUserDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: email */
+            email: string;
+            phone: Record<string, never> | null;
+            /**
+             * @description UserStatus enum value
+             * @example ACTIVE
+             */
+            status: string;
+        };
+        RiderResponseDto: {
+            /**
+             * Format: uuid
+             * @description Rider id (same as the user id)
+             */
+            userId: string;
+            licenseNo: Record<string, never> | null;
+            /** @default BIKE */
+            vehicleType: components["schemas"]["RiderVehicleType"];
+            vehiclePlate: Record<string, never> | null;
+            nrcNumber: Record<string, never> | null;
+            emergencyContactPhone: Record<string, never> | null;
+            isAvailable: boolean;
+            notes: Record<string, never> | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            user: components["schemas"]["RiderUserDto"];
+        };
+        RiderListResponseDto: {
+            data: components["schemas"]["RiderResponseDto"][];
+            meta: components["schemas"]["PaginationMetaDto"];
+        };
+        CreateRiderDto: {
+            /** @description Rider full name */
+            name: string;
+            /** Format: email */
+            email: string;
+            password: string;
+            phone?: string;
+            /**
+             * @description User status of the backing user row
+             * @default ACTIVE
+             * @enum {string}
+             */
+            status: "ACTIVE" | "INACTIVE";
+            /** @description Driving license number */
+            licenseNo?: string;
+            /**
+             * @default BIKE
+             * @enum {string}
+             */
+            vehicleType: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
+            /** @description Vehicle plate number */
+            vehiclePlate?: string;
+            /** @description National Registration Card number */
+            nrcNumber?: string;
+            /** @description Emergency contact phone number */
+            emergencyContactPhone?: string;
+            /**
+             * @description Whether the rider is currently available for deliveries
+             * @default true
+             */
+            isAvailable: boolean;
+            notes?: string;
+        };
+        UpdateRiderDto: {
+            name?: string;
+            phone?: string;
+            /** @enum {string} */
+            status?: "ACTIVE" | "INACTIVE";
+            licenseNo?: string;
+            /** @enum {string} */
+            vehicleType?: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
+            vehiclePlate?: string;
+            nrcNumber?: string;
+            emergencyContactPhone?: string;
+            isAvailable?: boolean;
+            notes?: string;
         };
     };
     responses: never;
@@ -728,6 +1006,349 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UpdateRoleResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by name, phone or channel name */
+                search?: string;
+                channelType?: components["schemas"]["ShopChannelType"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopListResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateShopDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ShopsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShopDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by name or phone */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerListResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCustomerDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CustomersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCustomerDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by rider name, email or phone (on the user row) */
+                search?: string;
+                /** @description Filter by vehicle type */
+                vehicleType?: string;
+                /** @description Filter by availability */
+                isAvailable?: boolean;
+                /** @description Filter by user status */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderListResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRiderDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RidersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRiderDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
                 };
             };
         };

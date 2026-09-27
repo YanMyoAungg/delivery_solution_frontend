@@ -25,6 +25,7 @@ interface UsersToolbarProps {
   roleFilter: string
   assignableRoles: Role[]
   hasFilters: boolean
+  hasPendingChanges: boolean
   onSearchInputChange: (value: string) => void
   onSearchSubmit: () => void
   onStatusFilterChange: (value: 'ALL' | UserStatus) => void
@@ -40,6 +41,7 @@ export function UsersToolbar({
   roleFilter,
   assignableRoles,
   hasFilters,
+  hasPendingChanges,
   onSearchInputChange,
   onSearchSubmit,
   onStatusFilterChange,
@@ -100,7 +102,7 @@ export function UsersToolbar({
         </SelectContent>
       </Select>
 
-      <Button variant="outline" onClick={onApply}>Apply</Button>
+      <Button variant="outline" onClick={onApply} disabled={!hasPendingChanges}>Apply</Button>
       {hasFilters && <Button variant="ghost" onClick={onReset}>Reset</Button>}
     </div>
   )

@@ -12,6 +12,9 @@ import { UsersPage } from '@/features/users/UsersPage'
 import { RolesPage } from '@/features/roles/RolesPage'
 import { PermissionsPage } from '@/features/permissions/PermissionsPage'
 import { ChangePasswordPage } from '@/features/settings/ChangePasswordPage'
+import { ShopsPage } from '@/features/shops/ShopsPage'
+import { CustomersPage } from '@/features/customers/CustomersPage'
+import { RidersPage } from '@/features/riders/RidersPage'
 import { ForbiddenPage } from '@/features/errors/ForbiddenPage'
 import { NotFoundPage } from '@/features/errors/NotFoundPage'
 
@@ -37,7 +40,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Root lands on the first destination the caller can open (never
-          bounces: Users → Roles → Permissions → Settings) */}
+          bounces: Users → Roles → Shops → Customers → Riders → Permissions → Settings) */}
       <Route
         path="/"
         element={
@@ -55,6 +58,15 @@ function AppRoutes() {
             </Route>
             <Route element={<ProtectedRoute perm="roles.read" />}>
               <Route path="/roles" element={<RolesPage />} />
+            </Route>
+            <Route element={<ProtectedRoute perm="shops.read" />}>
+              <Route path="/shops" element={<ShopsPage />} />
+            </Route>
+            <Route element={<ProtectedRoute perm="customers.read" />}>
+              <Route path="/customers" element={<CustomersPage />} />
+            </Route>
+            <Route element={<ProtectedRoute perm="riders.read" />}>
+              <Route path="/riders" element={<RidersPage />} />
             </Route>
             <Route element={<ProtectedRoute perm="permissions.read" />}>
               <Route path="/permissions" element={<PermissionsPage />} />
