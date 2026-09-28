@@ -1,15 +1,15 @@
 # Backend Phase 3.5 — Frontend Implementation Handoff
 
-**Backend status:** Implemented in `../d_api` and migrated locally. This document is for the frontend agent; no frontend feature code has been implemented in this change.
+**Status:** Backend and frontend Phase 3.5 are implemented and pushed. Keep this document as the frontend/API contract reference for future work.
 
-**Frontend repository:** Vite + React + TypeScript SPA. Follow the existing `CLAUDE.md` conventions. The frontend repo already has uncommitted rider/master-data work: inspect and preserve it; do not reset or overwrite it. The frontend project instructions prohibit adding new test files.
+**Frontend repository:** Vite + React + TypeScript SPA. Follow the existing `CLAUDE.md` conventions. The frontend project instructions prohibit adding new test files.
 
 ## Start here
 
-1. Start the backend from `../d_api` with `pnpm start:dev` and ensure its database has migrations and seed grants applied.
-2. Regenerate the API contract with `pnpm codegen`. `src/types/api.ts` is generated and must not be hand-edited.
-3. Implement the work below using generated types and the existing feature API/hooks, form, permission, and navigation patterns.
-4. Run `pnpm lint` and `pnpm build`; manually smoke the flows against the backend. Do not add new test files in this repository.
+1. If the backend API changes, start `../d_api` with `pnpm start:dev` and ensure migrations and seed grants are applied.
+2. Regenerate the API contract with `pnpm codegen` after an API change. `src/types/api.ts` is generated and must not be hand-edited.
+3. Follow the implementation details below when maintaining or extending these flows.
+4. Run `pnpm lint`, `pnpm build`, and the existing tests; manually smoke against the backend. Do not add new test files in this repository.
 
 The backend OpenAPI contract at `GET /api/v1/docs-json` is the authoritative source if a detail in this handoff and generated schema ever differ.
 
