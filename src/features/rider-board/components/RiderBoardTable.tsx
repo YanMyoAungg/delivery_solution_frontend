@@ -42,7 +42,7 @@ export function RiderBoardTable({ orders }: RiderBoardTableProps) {
                 <TableCell>{order.isMine ? 'You' : toDisplayString(order.assignedRiderName ?? null) ?? '—'}</TableCell>
                 <TableCell><Badge variant={order.status === 'DELIVERED' ? 'default' : order.status === 'FAILED' ? 'destructive' : 'secondary'}>{order.status}</Badge></TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(order.createdAt)}</TableCell>
-                <TableCell>{order.isMine ? <div className="min-w-48 text-xs"><p className="font-medium">{toDisplayString(order.customerName ?? null) ?? 'Customer'}</p><p className="text-muted-foreground">{toDisplayString(order.customerPhone ?? null) ?? 'Phone not provided'}</p><p className="max-w-64 truncate text-muted-foreground">{toDisplayString(order.customerAddress ?? null) ?? 'Address not provided'}</p><p className="mt-1 tabular-nums">COD {formatAmount(order.codAmount)} · Fee {formatAmount(order.deliveryFee)}</p></div> : <span className="text-xs text-muted-foreground">Routing details only · customer details are hidden</span>}</TableCell>
+                <TableCell>{order.isMine ? <div className="min-w-48 text-xs"><p className="font-medium">{toDisplayString(order.customerName ?? null) ?? 'Customer'}</p><p className="text-muted-foreground">{toDisplayString(order.customerPhone ?? null) ?? 'Phone not provided'}</p><p className="max-w-64 truncate text-muted-foreground">{toDisplayString(order.customerAddress ?? null) ?? 'Address not provided'}</p><p className="mt-1 tabular-nums">COD {formatAmount(order.codAmount)} · Fee {formatAmount(order.deliveryFee)}</p><p className="mt-1">Package {formatPackageInfo(order.packageInfo)}</p><p className="max-w-64 truncate text-muted-foreground">Notes {toDisplayString(order.notes ?? null) ?? '—'}</p></div> : <span className="text-xs text-muted-foreground">Routing details only · customer details are hidden</span>}</TableCell>
                 <TableCell>{canAct ? <div className="flex gap-1"><Button size="icon-sm" aria-label={`Complete ${order.trackingCode}`} disabled={completeMutation.isPending} onClick={() => void completeOrder(order)}><Check className="size-3.5" /></Button><Button size="icon-sm" variant="outline" aria-label={`Fail ${order.trackingCode}`} onClick={() => setFailingOrder(order)}><X className="size-3.5" /></Button></div> : <span className="text-xs text-muted-foreground">Read only</span>}</TableCell>
               </TableRow>
             )
@@ -59,6 +59,10 @@ function formatAmount(amount: string | undefined): string {
   const [whole, fraction = '00'] = amount.split('.')
   const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   return `${grouped}.${fraction}`
+}
+
+function formatPackageInfo(value: Record<string, never> | null | undefined): string {
+  return value ? JSON.stringify(value) : '—'
 }
 
 function toDisplayString(value: string | Record<string, never> | null): string | null {

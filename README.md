@@ -12,10 +12,15 @@ Vite + React + TypeScript operations SPA for the Delivery Solution API (`../d_ap
 
 ## Local development
 
-From this directory:
+Start the backend in one terminal:
 
 ```bash
 cd ../d_api && pnpm start:dev  # backend at http://localhost:3000
+```
+
+Then run the frontend and checks from this repository in another terminal:
+
+```bash
 pnpm dev                       # frontend at http://localhost:5173
 pnpm lint
 pnpm build
@@ -45,3 +50,7 @@ pnpm codegen
 ## Project conventions
 
 See `CLAUDE.md` for the app architecture, permission rules, UI conventions, and contribution checks. Do not add tests in this repo; keep the existing suite passing and verify feature changes with lint, build, and a manual smoke against the backend.
+
+## OpenCode
+
+Run `opencode .` from the frontend repository root. `opencode.json` loads `CLAUDE.md` as project instructions, and `AGENTS.md` provides OpenCode-specific notes for Claude-only skill references and repository workflow. Use `/verify` to run lint, build, and the existing test suite. Provider authentication stays in your local OpenCode configuration, not this repository.

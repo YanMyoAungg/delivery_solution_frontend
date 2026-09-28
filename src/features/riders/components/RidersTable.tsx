@@ -45,7 +45,7 @@ export function RidersTable({
         <TableBody>
           {riders.map((rider) => {
             const status = toUserStatus(rider.status)
-            const isSelf = currentUserId !== null && rider.id === currentUserId
+            const isSelf = currentUserId !== null && rider.userId === currentUserId
             // Self-row delete is hidden entirely: deleting yourself destroys your own login.
             const showDelete = canDelete && !isSelf
             return (

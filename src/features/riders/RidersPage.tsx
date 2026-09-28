@@ -26,7 +26,7 @@ export function RidersPage() {
   const [riderToEdit, setRiderToEdit] = useState<Rider | undefined>(undefined)
   const [riderToDelete, setRiderToDelete] = useState<Rider | null>(null)
 
-  // The rider identity id is the backing account id; deleting yourself would destroy your own login.
+  // Rider `userId` links the profile to the authenticated account; deleting yourself destroys your login.
   const currentUser = useAuthStore((state) => state.user)
 
   const canCreate = usePermission('riders.create')
