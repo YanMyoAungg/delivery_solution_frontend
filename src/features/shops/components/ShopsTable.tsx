@@ -1,24 +1,34 @@
-import { Pencil, Trash2 } from 'lucide-react'
-import { toNullableString } from '@/lib/nullable'
-import { formatDate } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import type { components } from '@/types/api'
-
-type Shop = components['schemas']['ShopResponseDto']
-
-const CHANNEL_LABELS: Record<string, string> = { VIBER: 'Viber', TELEGRAM: 'Telegram' }
+import { Pencil, Trash2 } from "lucide-react";
+import { toNullableString } from "@/lib/nullable";
+import { formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { Shop } from "../api";
+import { channelTypeLabel } from "../channel-types";
 
 interface ShopsTableProps {
-  shops: Shop[]
-  canUpdate: boolean
-  canDelete: boolean
-  onEdit: (shop: Shop) => void
-  onDelete: (shop: Shop) => void
+  shops: Shop[];
+  canUpdate: boolean;
+  canDelete: boolean;
+  onEdit: (shop: Shop) => void;
+  onDelete: (shop: Shop) => void;
 }
 
-export function ShopsTable({ shops, canUpdate, canDelete, onEdit, onDelete }: ShopsTableProps) {
+export function ShopsTable({
+  shops,
+  canUpdate,
+  canDelete,
+  onEdit,
+  onDelete,
+}: ShopsTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border">
       <Table>
@@ -29,7 +39,9 @@ export function ShopsTable({ shops, canUpdate, canDelete, onEdit, onDelete }: Sh
             <TableHead>Channel</TableHead>
             <TableHead>Channel name</TableHead>
             <TableHead>Created</TableHead>
-            {(canUpdate || canDelete) && <TableHead className="text-right">Actions</TableHead>}
+            {(canUpdate || canDelete) && (
+              <TableHead className="text-right">Actions</TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,19 +49,27 @@ export function ShopsTable({ shops, canUpdate, canDelete, onEdit, onDelete }: Sh
             <TableRow key={shop.id}>
               <TableCell className="font-medium">{shop.name}</TableCell>
               <TableCell className="font-mono text-muted-foreground">
-                {toNullableString(shop.phone ?? null) || '—'}
+                {toNullableString(shop.phone ?? null) || "—"}
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">{CHANNEL_LABELS[shop.channelType] ?? shop.channelType}</Badge>
+                <Badge variant="secondary">
+                  {channelTypeLabel(shop.channelType)}
+                </Badge>
               </TableCell>
-              <TableCell className="text-muted-foreground">{shop.channelName}</TableCell>
-              <TableCell className="text-muted-foreground">{formatDate(shop.createdAt)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {shop.channelName}
+              </TableCell>
+
+              <TableCell className="text-muted-foreground">
+                {formatDate(shop.createdAt)}
+              </TableCell>
               {(canUpdate || canDelete) && (
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     {canUpdate && (
                       <Button
-                        variant="ghost" size="icon-sm"
+                        variant="ghost"
+                        size="icon-sm"
                         aria-label={`Edit ${shop.name}`}
                         onClick={() => onEdit(shop)}
                       >
@@ -58,7 +78,8 @@ export function ShopsTable({ shops, canUpdate, canDelete, onEdit, onDelete }: Sh
                     )}
                     {canDelete && (
                       <Button
-                        variant="ghost" size="icon-sm"
+                        variant="ghost"
+                        size="icon-sm"
                         aria-label={`Delete ${shop.name}`}
                         onClick={() => onDelete(shop)}
                       >
@@ -73,5 +94,5 @@ export function ShopsTable({ shops, canUpdate, canDelete, onEdit, onDelete }: Sh
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). The first vertical slice is built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
+Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). Built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password, shops, riders, customers, township coverage/configuration, office order management, and the RIDER delivery board. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
 
 **Locked decisions (user):**
 - **Vite + React SPA + TypeScript** — not Next.js (internal ops tool, pure JSON API, no SSR).
@@ -35,11 +35,22 @@ Source of truth: **`GET /api/v1/docs-json`** — regenerate types with `pnpm cod
 - Permissions: `GET /permissions` (catalog grouped by `module`) gated `permissions.read`; `GET/PUT /permissions/roles/:roleId` (`PUT` body `{ permissions: string[] }`, replace-set) gated **`permissions.update`**. **The catalog is fixed and read-only from the frontend: `POST /permissions` and `DELETE /permissions/:name` are gone (404).**
 
 RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `users.role_id`, OWNER/ADMIN manage everything from the UI). UI must mirror backend rules:
-- **The grid is fixed**: 6 actions (`create, read, update, delete, export, import`) × 13 modules = 68 keys. `view ≡ read`, `edit ≡ update`; the key is `{module}.{action}`, lowercase. `src/types/permission.ts` mirrors it as a typed union so a backend rename is a build error, not a silent 403.
+- **The grid is fixed**: 12 modules / 62 keys across actions (`create, read, update, delete, export, import`). `view ≡ read`, `edit ≡ update`; the key is `{module}.{action}`, lowercase. `src/types/permission.ts` mirrors it as a typed union so a backend rename is a build error, not a silent 403. There is no `pickups` module or `deliveries.claim` permission; township endpoints use `orders.*`.
 - `is_system` roles (OWNER): hold every permission, rows read-only/locked, zero grant rows — so read the grid from `isSystem`, **never** from `GET /permissions/roles/:roleId` (that returns empty for OWNER).
 - ADMIN: manages OFFICER/created roles only; OWNER + ADMIN rows read-only; can grant only keys ADMIN itself holds; own role read-only.
 - role `name` immutable after create (`PATCH /roles/:id` takes `{ description? }` only); delete-role blocked when `userCount > 0` (409 surfaces backend message).
 - Offer only catalog keys in the grid (`PUT` of unknown keys 404s). A module × action the catalog doesn't define renders as an inert `·` cell. `PUT` replaces the whole set, so keys no longer in the catalog are pruned on save.
+
+### Phase 3.5 operations flows
+
+- Contract details, exact rider-board fields/redaction, permissions, query parameters, and office/rider route behavior are recorded in `BACKEND_PHASE_3_5_HANDOFF.md`; use it alongside generated `src/types/api.ts`.
+- `src/features/townships/` owns office township list/create/rename. The API's `selectable` field is derived from active rider coverage; it is read-only in the UI. Townships cannot be deleted.
+- `src/features/riders/` manages complete township coverage through `townshipIds`. Updating coverage replaces the whole set; inactive riders are not eligible for new order assignment. The flattened rider API's `id` is the account identity used for rider updates/deletion.
+- `src/features/orders/` owns office order creation/list/detail. Creation offers only `GET /townships?selectable=true` results, requires a township, and does not select a rider. The API performs per-township round-robin assignment. Show the returned township and rider in office surfaces and surface API errors when coverage changes before submit.
+- `src/features/rider-board/` is a RIDER-only route at `/rider`, outside the office `AppShell`. The authenticated root/login redirect sends RIDER users there. Rider APIs self-scope from the JWT; do not authorize by query params or request office orders for rider views. RIDER must not receive `orders.read`.
+- The rider board defaults to `filter=all`, and sends a calendar date string (`YYYY-MM-DD`) without converting it through UTC ISO slicing. Metrics and rows share the selected assignment date. COD values remain decimal strings; display formatting must not change values used in calculations.
+- Only `isMine === true`, `status === 'ASSIGNED'`, with a `deliveryAttemptId` may show complete/fail actions. Other rider rows are deliberately redacted routing context and read-only; do not show sensitive placeholders or fetch another endpoint to fill the omitted PII.
+- Order/delivery statuses are `ASSIGNED | DELIVERED | FAILED`. No unassigned pool, claim/start action, pickup flow, `OUT_FOR_DELIVERY`, `STARTED`, or `RETURNED` order state. Shift/manifest, custody-return, and failure-threshold workflows are deferred.
 
 ## Architecture (planned layout)
 
@@ -47,10 +58,12 @@ RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `u
 - `src/lib/store/` (zustand) — auth store: `token`, `user`, `permissions`, `setSession`, `clearSession`, `hasPermission(key: PermissionKey)`; token persisted in `localStorage`. `permissions` stays `string[]` (server data); `PermissionKey` is assignable to it.
 - `usePermission` hook + `<ProtectedRoute perm="users.read">`: route-level gate → 403 page; button/link-level gate hides element. Both take a `PermissionKey`, so a stale key fails to compile. Mirrors backend grants so UI hides what the API would 403.
 - `src/components/layout/AppShell` — sidebar (desktop ≥1024px, mobile collapsible drawer), topbar with role badge + dropdown (Change Password / Logout), `<Outlet/>`.
-- `src/features/auth|users|roles|permissions|settings/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types — `permissions/` no longer has one: the grant grid has no form to validate), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
+- `src/features/auth|users|roles|permissions|settings|shops|riders|customers|townships|orders|rider-board/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types), optional **`mappers.ts`** (pure DTO↔form-state translation), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
 - `src/config/` — app-level static config (e.g. `src/config/navigation.ts` — sidebar `NAV_ITEMS` + `firstAllowedPath`). NOT in `lib/`.
 - `src/types/` — `api.ts` (codegen, read-only) + `permission.ts` (hand-written mirror of the backend's `permission-keys.ts`: `MODULE_ACTIONS`, `PermissionKey`, `ACTION_ORDER`). The catalog is fixed, so keys autocomplete at compile time; which cells *exist* still comes from the API response.
-- `src/components/ui/` — shadcn components: `button`, `input`, `label`, `card`, `dialog`, `table`, `dropdown-menu`, `badge`, `select`, `alert-dialog`, `sonner`, `skeleton`, `pagination`.
+- `src/components/ui/` — shadcn components: `button`, `input`, `label`, `card`, `dialog`, `table`, `dropdown-menu`, `badge`, `select`, `alert-dialog`, `sonner`, `skeleton`, `pagination`, `checkbox`.
+- `src/components/form/` — field primitives, one responsibility each: `Form` (`FormProvider` + `<form>`, `noValidate`), `FormBody` (scroll region), `FormField` (label + control + inline error), `FormFooter` (Close/Submit), `FormAlert` (root/API error), `TextField`, `SelectField`, `CheckboxField`, `FilterSelect`. `SelectField` is RHF-bound (needs `control`); `FilterSelect` is the controlled, RHF-free one for filter toolbars.
+- `src/lib/constants/` — shared cross-feature values: `user-status.ts` (`USER_STATUSES`, `UserStatusValue`, `USER_STATUS_OPTIONS`, `userStatusLabel`, `userStatusTone`, `toUserStatus`). Feature-owned enums stay in the feature: `features/riders/vehicle-types.ts`, `features/shops/channel-types.ts`.
 
 ## Naming conventions (mandatory)
 
@@ -62,6 +75,28 @@ RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `u
 - **Constants** — UPPER_SNAKE_CASE: `VITE_API_URL`, query keys.
 - **Booleans** — `is`/`has`/`can` prefix: `isSystem`, `hasPermission`, `isDirty`.
 - **Types & interfaces** — PascalCase, `Props` suffix on component props, DTO-suffixed on API shapes: `UserResponseDto`, `LoginPageProps`. Generated types (codegen) are read-only inputs, never hand-edited.
+
+## Dialogs & forms (mandatory)
+
+The user asked for **one responsibility per file, separate files** — do not co-locate a dialog with its form.
+
+- `XDialog.tsx` owns the dialog and nothing else: `open`/`onClose` (flat props, never a `state={{ open, x }}` wrapper), the copy, which mutation runs, and the toasts. It contains **no inputs**.
+- `XForm.tsx` exports the fields and nothing else — one component, `XFormFields()`. It reads `register`/`control`/`errors` from `useFormContext`, so it takes only what the form genuinely can't derive (mode, query-backed options).
+- `mappers.ts` (feature root) holds the pure DTO↔form-state functions: `toXFormValues`, `toXRequestBody`, `EMPTY_X`. Pure, no JSX — keeps the form file to a single component export and avoids `react-refresh/only-export-components` warnings.
+- **One schema per entity, mode-aware**: `xSchema(isEditing)` instead of paired create/update schemas. Relax a rule by *not adding it*, never by `.min(0)` — Zod v4 accumulates string checks, so `z.string().min(1).min(0)` still fails. Keep both branches `z.string()` rather than `.optional()` so the inferred value type stays `string` and the request body needs no `?? null` on a field a form can't leave absent.
+- **No `key={xToEdit?.id ?? 'new'}` remount hacks.** `useForm({ values })` re-seeds when the target changes; `handleClose` calls `form.reset(formValues)` for the same-mode reopen case. Reset on close is load-bearing — half-typed input and a stale 409 banner must not survive a reopen.
+- Two forms are correct ONLY when the modes share no editable field (roles: `name` is immutable after create). Users share 4 of 5 fields, so they stay one mode-driven form.
+- Structure inside `<Form>`: `DialogHeader` (pinned) → `FormBody` (the only scroll region) → `FormAlert` → `FormFooter` (pinned).
+- `FormBody` must be **inside** `<Form>` — the submit button only submits fields in the same `<form>` element.
+
+## Enum values (mandatory)
+
+One source of truth per value set; never hand-write a union a second time.
+
+- Feature-owned sets get a module in the feature folder: `vehicle-types.ts`, `channel-types.ts`. Cross-feature ones go in `src/lib/constants/` (user status is read by both `users` and `riders`).
+- Each exports the tuple (`CHANNEL_TYPES`), the derived union (`ChannelType`), `*_OPTIONS` **derived from the tuple**, and a `*Label`/`*Tone` helper. The tuple feeds `z.enum(...)` directly, so a backend rename is a compile error, not a silent validation hole.
+- Keep `*_OPTIONS` at module scope — Base UI memoises its `items` label map off that array's identity, and an inline literal rebuilds it every render.
+- Shared badge colour is `badgeClass(tone: BadgeTone)` in `lib/utils`, keyed on `'positive' | 'warning' | 'negative'` — **not** on a domain value. A caller asks for the colour it wants; a caller that has a status maps it first via `userStatusTone`.
 
 ## Skills — invoke before writing frontend code
 
@@ -97,6 +132,11 @@ Layering: `ui-ux-pro-max` (usability/structure) → `taste` (visual polish) — 
 - Menu items and `DropdownMenuLabel` must nest inside a `<DropdownMenuGroup>` — Base UI throws `MenuGroupContext is missing` (white screen) otherwise.
 - Do NOT compose triggers via `render={<Button/>}` when the inner component itself uses `useRender` (base-nova Button) — it double-owns the DOM node and breaks the menu context. Prefer a plain `<DropdownMenuTrigger className="...">` styled with tokens.
 - `<Label>` has no `required` visual — mark requiredness with text; Zod enforces.
+- **A `fixed`, viewport-centred popup overflows off BOTH screen edges and is unscrollable** unless it has a `max-height`. `body` cannot scroll a `fixed` element, so an uncapped dialog hides its own first field and its submit button. This shipped a real bug: the 12-field rider form was taller than a 13" MacBook's ~760px viewport and its Save button sat at y=881, unreachable. `DialogContent` is now `flex flex-col` + `max-h-[calc(100vh-2rem)]` + `supports-[height:100dvh]:…` + `overflow-hidden`.
+- **Every element between the popup and the scroll region needs `min-h-0`** — the popup, the `<form>`, and the scroll `div`. A flex item defaults to `min-height: auto` and refuses to shrink below its content, so `flex-1` alone silently does nothing and `overflow-y-auto` never engages. This is the single most likely cause of "my dialog won't scroll" — check the whole ancestor chain, not just the div that has `overflow`.
+- Don't add `flex-1` (basis 0) to the `<form>`: a short form would then collapse the popup to zero height. Content-sized basis + `min-h-0` is the combination that shrinks only when it has to.
+- Base UI `Select` resolves the trigger's label from the **`items` map, not the `SelectItem` children**. If a current value is excluded from the rendered options (e.g. an ADMIN editing a role they may not assign), the trigger shows a raw id — include it in the options to keep the name visible.
+- Two conflicting `max-h-*` utilities (e.g. `100vh` and `100dvh`) have equal specificity and Tailwind's class order decides the winner unpredictably. Use `supports-[height:100dvh]:` for the progressive override instead.
 
 ### Type safety / code quality (mandatory)
 
@@ -104,8 +144,12 @@ Layering: `ui-ux-pro-max` (usability/structure) → `taste` (visual polish) — 
 - No `@ts-ignore` / `@ts-expect-error` / bare `!`. Codegen output may carry `Record<string, never>`/loose union stubs — narrow with a typed helper or explicit DTO interface instead of casting to `any`.
 - Use `unknown` at trust boundaries, then narrow with type guards. Prefer `satisfies` for const config arrays bounded by a broader type.
 - Route/button gates read the zustand `permissions[]` via one shared `usePermission`/`<Can>` — never duplicate the permission-matrix in components.
+- **One component export per file** in a `components/` folder. A file that exports a component *and* a constant or helper trips `react-refresh/only-export-components`; move the non-component to `mappers.ts` / `lib/` rather than suppressing the rule.
+- `useFormContext` is only safe *inside* `<Form>`. A fields component rendered outside it throws at runtime, and `tsc` cannot catch that — keep the provider in the parent dialog, never in the fields file.
+- A controlled `Select` needs its options list to include the current value (see Base UI gotchas). Narrow the callback's `string` with a real `options.some(...)` type guard, not `as` — a hand-written `value === 'A' || value === 'B'` chain silently does nothing when an option is added.
 - **No `setState` inside `useEffect` keyed on a fresh-reference value** (`new Set()`, `new Array()`, `[]` via `?? default` when a React Query is disabled/error/`undefined`). This causes an infinite render loop ("Maximum update depth exceeded" → page freezes). Instead: derive the display value from the query response directly, or use the derive-or-own draft pattern (`useState<{roleId: string; set: Set<string>} | null>(null)`) — no effect, no loop.
 - `react-hooks/exhaustive-deps` is **error**, not warn. Never `eslint-disable` it — that's how the freeze shipped. If a dep is genuinely unsafe, isolate the value with `useRef` or restructure; do not suppress the rule.
+- **Verify layout in a real browser, not jsdom.** jsdom has no layout engine, so `max-h`, `overflow-y-auto` and `min-h-0` all "pass" while the real page is broken. For any height/scroll/position change, build (`pnpm build`), hand-write a throwaway HTML harness under `dist/` that reuses the built CSS and mirrors the real DOM structure, serve it (`python3 -m http.server`), and measure `clientHeight`/`scrollHeight`/`getBoundingClientRect()` with `agent-browser`. Delete the harness afterwards. This is how the unreachable-Save-button bug was found and confirmed fixed.
 
 
 ### React Query (mandatory)

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Info, Lock, Save } from 'lucide-react'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { filterAssignableRoles } from '@/lib/auth/filterAssignableRoles'
 import { getApiErrorMessage } from '@/lib/api/client'

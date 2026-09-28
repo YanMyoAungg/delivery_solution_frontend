@@ -1,19 +1,13 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { toNullableString } from '@/lib/nullable'
-import { formatDate, statusBadgeClass } from '@/lib/utils'
+import { formatDate, badgeClass } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import type { components } from '@/types/api'
-
-type Rider = components['schemas']['RiderResponseDto']
-
-const VEHICLE_TYPE_LABELS: Record<string, string> = {
-  BIKE: 'Bike',
-  MOTORBIKE: 'Motorbike',
-  CAR: 'Car',
-  OTHER: 'Other',
-}
+import { toUserStatus, userStatusLabel, userStatusTone } from '@/lib/constants/user-status'
+import type { Rider } from '../api'
+import { vehicleTypeLabel } from '../vehicle-types'
+import { useTownships } from '@/features/townships/api'
 
 interface RidersTableProps {
   riders: Rider[]
@@ -32,6 +26,7 @@ export function RidersTable({
   onEdit,
   onDelete,
 }: RidersTableProps) {
+  const { data: townships = [] } = useTownships()
   return (
     <div className="overflow-x-auto rounded-lg border">
       <Table>
@@ -41,7 +36,7 @@ export function RidersTable({
             <TableHead>Email</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Vehicle type</TableHead>
-            <TableHead>Availability</TableHead>
+            <TableHead>Township coverage</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
             {(canUpdate || canDelete) && <TableHead className="text-right">Actions</TableHead>}
@@ -49,31 +44,28 @@ export function RidersTable({
         </TableHeader>
         <TableBody>
           {riders.map((rider) => {
-            // Codegen stubs user.status as a plain string — narrow to the badge union.
-            const status = rider.user.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
-            const isSelf = currentUserId !== null && rider.userId === currentUserId
+            const status = toUserStatus(rider.status)
+            const isSelf = currentUserId !== null && rider.id === currentUserId
             // Self-row delete is hidden entirely: deleting yourself destroys your own login.
             const showDelete = canDelete && !isSelf
             return (
-              <TableRow key={rider.userId}>
-                <TableCell className="font-medium">{rider.user.name}</TableCell>
-                <TableCell className="text-muted-foreground">{rider.user.email}</TableCell>
+              <TableRow key={rider.id}>
+                <TableCell className="font-medium">{rider.name}</TableCell>
+                <TableCell className="text-muted-foreground">{rider.email}</TableCell>
                 <TableCell className="font-mono text-muted-foreground">
-                  {toNullableString(rider.user.phone ?? null) || '—'}
+                  {toNullableString(rider.phone ?? null) || '—'}
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">
-                    {VEHICLE_TYPE_LABELS[rider.vehicleType] ?? rider.vehicleType}
+                    {vehicleTypeLabel(rider.vehicleType)}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(rider.isAvailable ? 'ACTIVE' : 'INACTIVE')}`}>
-                    {rider.isAvailable ? 'Available' : 'Unavailable'}
-                  </span>
+                  {rider.townshipIds.map((townshipId) => townships.find((township) => township.id === townshipId)?.name ?? townshipId).join(', ') || 'No coverage'}
                 </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeClass(status)}`}>
-                    {status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClass(userStatusTone(status))}`}>
+                    {userStatusLabel(status)}
                   </span>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(rider.createdAt)}</TableCell>
@@ -83,7 +75,7 @@ export function RidersTable({
                       {canUpdate && (
                         <Button
                           variant="ghost" size="icon-sm"
-                          aria-label={`Edit ${rider.user.name}`}
+                          aria-label={`Edit ${rider.name}`}
                           onClick={() => onEdit(rider)}
                         >
                           <Pencil className="size-3.5" />
@@ -92,7 +84,7 @@ export function RidersTable({
                       {showDelete && (
                         <Button
                           variant="ghost" size="icon-sm"
-                          aria-label={`Delete ${rider.user.name}`}
+                          aria-label={`Delete ${rider.name}`}
                           onClick={() => onDelete(rider)}
                         >
                           <Trash2 className="size-3.5 text-destructive" />

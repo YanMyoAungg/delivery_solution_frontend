@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { readApiError } from '@/lib/api/client'
 import { useAuthStore } from '@/lib/store/auth.store'
-import { useRiders, useDeleteRider, type RidersFilters } from './api'
+import { useRiders, useDeleteRider, type Rider, type RidersFilters } from './api'
+import type { UserStatusValue } from '@/lib/constants/user-status'
 import { RidersToolbar } from './components/RidersToolbar'
 import { RidersTable } from './components/RidersTable'
 import { RiderDialog } from './components/RiderDialog'
@@ -14,25 +15,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { PAGE_SIZE } from '@/lib/constants'
-import type { components } from '@/types/api'
-
-type Rider = components['schemas']['RiderResponseDto']
-type VehicleType = components['schemas']['RiderVehicleType']
-type RiderStatus = 'ACTIVE' | 'INACTIVE'
 
 export function RidersPage() {
   const [filters, setFilters] = useState<RidersFilters>({ page: 1, perPage: PAGE_SIZE })
   // Local select states — bundled into filters only on Apply (ShopsPage pattern).
   const [searchInput, setSearchInput] = useState('')
-  const [vehicleType, setVehicleType] = useState<VehicleType | undefined>(undefined)
-  const [isAvailable, setIsAvailable] = useState<boolean | undefined>(undefined)
-  const [status, setStatus] = useState<RiderStatus | undefined>(undefined)
+  const [status, setStatus] = useState<UserStatusValue | undefined>(undefined)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [riderToEdit, setRiderToEdit] = useState<Rider | undefined>(undefined)
   const [riderToDelete, setRiderToDelete] = useState<Rider | null>(null)
 
-  // Self-row no-delete gate — riders have backing user rows; deleting yourself would destroy your own login.
+  // The rider identity id is the backing account id; deleting yourself would destroy your own login.
   const currentUser = useAuthStore((state) => state.user)
 
   const canCreate = usePermission('riders.create')
@@ -47,26 +41,20 @@ export function RidersPage() {
       page: 1,
       perPage: prev.perPage,
       search: searchInput || undefined,
-      vehicleType,
-      isAvailable,
       status,
     }))
   }
 
   function resetFilters() {
     setSearchInput('')
-    setVehicleType(undefined)
-    setIsAvailable(undefined)
     setStatus(undefined)
     setFilters({ page: 1, perPage: PAGE_SIZE })
   }
 
-  const hasFilters = !!filters.search || !!filters.vehicleType || filters.isAvailable !== undefined || !!filters.status
+  const hasFilters = !!filters.search || !!filters.status
   // Apply is enabled only when the local draft differs from the committed filters.
   const hasPendingChanges =
     (searchInput || undefined) !== filters.search ||
-    vehicleType !== filters.vehicleType ||
-    isAvailable !== filters.isAvailable ||
     status !== filters.status
 
   return (
@@ -85,15 +73,11 @@ export function RidersPage() {
 
       <RidersToolbar
         searchInput={searchInput}
-        vehicleType={vehicleType}
-        isAvailable={isAvailable}
         status={status}
         hasFilters={hasFilters}
         hasPendingChanges={hasPendingChanges}
         onSearchInputChange={setSearchInput}
         onSearchSubmit={applyFilters}
-        onVehicleTypeChange={setVehicleType}
-        onIsAvailableChange={setIsAvailable}
         onStatusChange={setStatus}
         onApply={applyFilters}
         onReset={resetFilters}
@@ -133,8 +117,8 @@ export function RidersPage() {
       )}
 
       <RiderDialog
-        key={riderToEdit?.userId ?? 'new'}
-        state={{ open: dialogOpen, rider: riderToEdit }}
+        open={dialogOpen}
+        rider={riderToEdit}
         onClose={() => { setDialogOpen(false); setRiderToEdit(undefined) }}
       />
 
@@ -142,10 +126,10 @@ export function RidersPage() {
         open={!!riderToDelete}
         onClose={() => setRiderToDelete(null)}
         title="Delete rider?"
-        description={`This permanently removes ${riderToDelete?.user.name ?? 'the rider'} and destroys their login account. This action cannot be undone.`}
+        description={`This permanently removes ${riderToDelete?.name ?? 'the rider'} and destroys their login account. This action cannot be undone.`}
         onConfirm={async () => {
           if (!riderToDelete) return
-          await deleteRiderMutation.mutateAsync(riderToDelete.userId)
+          await deleteRiderMutation.mutateAsync(riderToDelete.id)
           toast.success('Rider deleted')
         }}
       />

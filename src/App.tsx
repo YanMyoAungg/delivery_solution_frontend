@@ -17,6 +17,9 @@ import { CustomersPage } from '@/features/customers/CustomersPage'
 import { RidersPage } from '@/features/riders/RidersPage'
 import { ForbiddenPage } from '@/features/errors/ForbiddenPage'
 import { NotFoundPage } from '@/features/errors/NotFoundPage'
+import { TownshipsPage } from '@/features/townships/TownshipsPage'
+import { OrdersPage } from '@/features/orders/OrdersPage'
+import { RiderBoardPage } from '@/features/rider-board/RiderBoardPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +36,14 @@ const queryClient = new QueryClient({
 
 function RedirectToFirst() {
   const hasPermission = useAuthStore((state) => state.hasPermission)
+  const user = useAuthStore((state) => state.user)
+  if (user?.role === 'RIDER') return <Navigate to="/rider" replace />
   return <Navigate to={firstAllowedPath(hasPermission)} replace />
+}
+
+function RequireRider() {
+  const user = useAuthStore((state) => state.user)
+  return user?.role === 'RIDER' ? <RiderBoardPage /> : <Navigate to="/" replace />
 }
 
 function AppRoutes() {
@@ -52,6 +62,7 @@ function AppRoutes() {
       {/* Protected shell — restore session on boot, then require token */}
       <Route element={<AuthBootstrap />}>
         <Route element={<RequireAuth />}>
+          <Route path="/rider" element={<RequireRider />} />
           <Route element={<AppShell />}>
             <Route element={<ProtectedRoute perm="users.read" />}>
               <Route path="/users" element={<UsersPage />} />
@@ -67,6 +78,10 @@ function AppRoutes() {
             </Route>
             <Route element={<ProtectedRoute perm="riders.read" />}>
               <Route path="/riders" element={<RidersPage />} />
+            </Route>
+            <Route element={<ProtectedRoute perm="orders.read" />}>
+              <Route path="/townships" element={<TownshipsPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
             </Route>
             <Route element={<ProtectedRoute perm="permissions.read" />}>
               <Route path="/permissions" element={<PermissionsPage />} />

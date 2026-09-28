@@ -16,11 +16,17 @@ interface AuthState {
 }
 
 /**
- * OWNER (system role) holds every permission — backend shortcircuits to the
- * full catalog. `hasPermission` mirrors that so newly-created catalog keys
- * gate correctly for OWNER even before a re-login picks them up.
+ * OWNER (system role) holds every permission — the backend shortcircuits to
+ * the full catalog. Mirrored client-side so newly-created catalog keys gate
+ * correctly for OWNER even before a re-login picks them up.
+ *
+ * Exported (not module-private) because it is the single source of truth for
+ * that rule: both the imperative `hasPermission` below and the reactive
+ * `usePermission` hook must agree, or gates disagree with the API.
  */
-const isOwner = (user: User | null) => user?.role === 'OWNER'
+export function isOwner(user: User | null): boolean {
+  return user?.role === 'OWNER'
+}
 
 export const useAuthStore = create<AuthState>()(
   persist(

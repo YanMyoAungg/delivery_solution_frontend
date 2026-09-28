@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@/lib/zodResolver'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { changePassword } from '@/features/auth/api'
 import {
   changePasswordSchema,
@@ -26,7 +26,7 @@ export function ChangePasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ChangePasswordValues>({
-    resolver: zodResolver<ChangePasswordValues>(changePasswordSchema),
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   })
   const { formState: { errors } } = form

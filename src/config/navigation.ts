@@ -6,6 +6,8 @@ import {
   Store,
   UserRound,
   Bike,
+  MapPinned,
+  ClipboardList,
   type LucideIcon,
 } from "lucide-react";
 import type { PermissionKey } from "@/types/permission";
@@ -25,6 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/shops", label: "Shops", icon: Store, permission: "shops.read" },
   { to: "/customers", label: "Customers", icon: UserRound, permission: "customers.read" },
   { to: "/riders", label: "Riders", icon: Bike, permission: "riders.read" },
+  { to: "/townships", label: "Townships", icon: MapPinned, permission: "orders.read" },
+  { to: "/orders", label: "Orders", icon: ClipboardList, permission: "orders.read" },
   {
     to: "/permissions",
     label: "Permissions",

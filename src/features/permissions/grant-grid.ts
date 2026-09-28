@@ -21,7 +21,7 @@ export interface GridLayout {
   rows: GridRow[]
 }
 
-/** `orders.pickup` → `pickup`; `shops` → `shops`. */
+/** `orders.read` → `read`; `shops` → `shops`. */
 export function permissionAction(key: string): string {
   const separator = key.indexOf('.')
   return separator === -1 ? key : key.slice(separator + 1)

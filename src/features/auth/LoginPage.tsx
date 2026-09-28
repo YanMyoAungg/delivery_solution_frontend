@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Loader2, Truck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@/lib/zodResolver'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getApiErrorMessage } from '@/lib/api/client'
 import { login } from '@/features/auth/api'
 import { loginSchema, type LoginValues } from '@/features/auth/validations'
@@ -15,31 +15,32 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const token = useAuthStore((s) => s.token)
+  const user = useAuthStore((s) => s.user)
   const setSession = useAuthStore((s) => s.setSession)
 
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<LoginValues>({
-    resolver: zodResolver<LoginValues>(loginSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   })
 
   const { formState: { errors } } = form
 
   if (token) {
-    const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/users'
+    const from = user?.role === 'RIDER' ? '/rider' : (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/'
     return <Navigate to={from} replace />
   }
 
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/users'
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/'
 
   async function onSubmit(data: LoginValues) {
     setIsSubmitting(true)
     try {
       const response = await login(data)
       setSession(response.user, response.permissions, response.accessToken)
-      navigate(from, { replace: true })
+      navigate(response.user.role === 'RIDER' ? '/rider' : from, { replace: true })
     } catch (err) {
       const apiError = getApiErrorMessage(err)
       form.setError('root', { message: apiError === 'Unauthorized' ? 'Invalid email or password' : apiError })

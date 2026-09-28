@@ -1,316 +1,111 @@
-import { useForm, type UseFormRegisterReturn } from 'react-hook-form'
-import { zodResolver } from '@/lib/zodResolver'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/api/client'
-import { toNullableString } from '@/lib/nullable'
-import { useCreateShop, useUpdateShop } from '../api'
-import {
-  createShopSchema,
-  updateShopSchema,
-  type CreateShopValues,
-  type UpdateShopValues,
-} from '../validations'
-import type { components } from '@/types/api'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Form, FormBody, FormFooter } from '@/components/form/Form'
+import { FormAlert } from '@/components/form/FormAlert'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-
-type Shop = components['schemas']['ShopResponseDto']
-
-const CHANNEL_TYPE_OPTIONS = [
-  { value: 'VIBER', label: 'Viber' },
-  { value: 'TELEGRAM', label: 'Telegram' },
-] as const
-
-const CHANNEL_TYPE_ITEMS: Record<string, string> = Object.fromEntries(
-  CHANNEL_TYPE_OPTIONS.map((option) => [option.value, option.label]),
-)
+import { useCreateShop, useUpdateShop, type Shop } from '../api'
+import { shopSchema, type ShopValues } from '../validations'
+import { toShopFormValues, toShopRequestBody } from '../mappers'
+import { ShopFormFields } from './ShopForm'
 
 interface ShopDialogProps {
-  state: { open: boolean; shop?: Shop }
+  open: boolean
+  /** Absent in create mode. Its presence is what discriminates the two modes. */
+  shop?: Shop
   onClose: () => void
-}
-
-interface ShopFieldsProps {
-  nameField: UseFormRegisterReturn
-  channelNameField: UseFormRegisterReturn
-  phoneField: UseFormRegisterReturn
-  addressField: UseFormRegisterReturn
-  notesField: UseFormRegisterReturn
-  nameError?: string
-  channelNameError?: string
-  channelTypeError?: string
-  channelType: 'VIBER' | 'TELEGRAM'
-  onChannelTypeChange: (value: 'VIBER' | 'TELEGRAM') => void
 }
 
 /**
- * Shared fields. NOTE: the backend DTO has NO chatId field. A chatId sent in
- * the create/update payload is silently ignored by the API — and the handoff
- * doc warns against confusing it with channelName. We never render or send it.
+ * Owns the dialog and nothing else: visibility, the copy, which mutation runs,
+ * and the toasts. Every field lives in `ShopFormFields`, and the DTO↔form
+ * translation lives beside it in `ShopForm`.
+ *
+ * One form for create and edit. The two-mode `shop ? <Edit/> : <Create/>`
+ * branch this replaced cost far more than the duplicated markup suggests: each
+ * mode carried its own `useForm`, its own default-value mapping, its own
+ * `watch`/`setValue` plumbing and its own submit handler, so every field added
+ * to a shop had to be threaded through five places. Mode is now a single
+ * `isEditing` boolean feeding the title, the submit label and the mutation
+ * choice.
+ *
+ * `values` re-seeds the form when `shop` changes, which is what makes the
+ * parent-side `key={shopToEdit?.id ?? 'new'}` remount hack unnecessary. Reopening
+ * the *same* mode is the gap `values` can't see (identity is unchanged), so
+ * `handleClose` resets explicitly.
  */
-function ShopFields({
-  nameField,
-  channelNameField,
-  phoneField,
-  addressField,
-  notesField,
-  nameError,
-  channelNameError,
-  channelTypeError,
-  channelType,
-  onChannelTypeChange,
-}: ShopFieldsProps) {
-  return (
-    <>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-name">Name</Label>
-        <Input id="shop-name" required {...nameField} />
-        {nameError && <p className="text-xs text-destructive">{nameError}</p>}
-      </div>
+export function ShopDialog({ open, shop, onClose }: ShopDialogProps) {
+  const isEditing = shop !== undefined
+  const formValues = useMemo(() => toShopFormValues(shop), [shop])
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-channel-type">Channel</Label>
-        <Select
-          items={CHANNEL_TYPE_ITEMS}
-          value={channelType}
-          onValueChange={(value) => {
-            if (value === 'VIBER' || value === 'TELEGRAM') onChannelTypeChange(value)
-          }}
-        >
-          <SelectTrigger id="shop-channel-type" className="w-full">
-            <SelectValue placeholder="Select channel" />
-          </SelectTrigger>
-          <SelectContent>
-            {CHANNEL_TYPE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {channelTypeError && <p className="text-xs text-destructive">{channelTypeError}</p>}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-channel-name">Channel name</Label>
-        <Input id="shop-channel-name" required placeholder="e.g. Yangon Fresh Group" {...channelNameField} />
-        {channelNameError && <p className="text-xs text-destructive">{channelNameError}</p>}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-phone">Phone</Label>
-        <Input id="shop-phone" {...phoneField} />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-address">Address</Label>
-        <Input id="shop-address" {...addressField} />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="shop-notes">Notes</Label>
-        <Input id="shop-notes" {...notesField} />
-      </div>
-    </>
-  )
-}
-
-interface CreateShopFormProps {
-  open: boolean
-  onClose: () => void
-}
-
-function CreateShopForm({ open, onClose }: CreateShopFormProps) {
-  const form = useForm<CreateShopValues>({
-    resolver: zodResolver<CreateShopValues>(createShopSchema),
-    defaultValues: {
-      name: '',
-      channelType: 'VIBER' as const,
-      channelName: '',
-      phone: null,
-      address: null,
-      notes: null,
-    },
+  const form = useForm<ShopValues>({
+    resolver: zodResolver(shopSchema),
+    defaultValues: formValues,
+    values: formValues,
   })
+
   const createShopMutation = useCreateShop()
-  const { formState: { errors }, setValue } = form
-  const channelType = form.watch('channelType') ?? 'VIBER'
-
-  async function onSubmit(data: CreateShopValues) {
-    try {
-      await createShopMutation.mutateAsync({
-        name: data.name,
-        channelType: data.channelType,
-        channelName: data.channelName,
-        phone: data.phone,
-        address: data.address,
-        notes: data.notes,
-      })
-      toast.success('Shop created')
-      onClose()
-    } catch (err) {
-      form.setError('root', { message: getApiErrorMessage(err) })
-    }
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="flex flex-col gap-4">
-          <DialogHeader>
-            <DialogTitle>New shop</DialogTitle>
-            <DialogDescription>Create a partner shop and its chat channel.</DialogDescription>
-          </DialogHeader>
-
-          <ShopFields
-            nameField={form.register('name')}
-            channelNameField={form.register('channelName')}
-            phoneField={form.register('phone')}
-            addressField={form.register('address')}
-            notesField={form.register('notes')}
-            nameError={errors.name?.message}
-            channelNameError={errors.channelName?.message}
-            channelTypeError={errors.channelType?.message}
-            channelType={channelType}
-            onChannelTypeChange={(value) => setValue('channelType', value, { shouldValidate: true })}
-          />
-
-          {errors.root && (
-            <div className="rounded-md bg-destructive/10 p-3">
-              <p className="text-sm text-destructive">{errors.root.message}</p>
-            </div>
-          )}
-
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline" />}>
-              Close
-            </DialogClose>
-            <Button type="submit" disabled={createShopMutation.isPending}>
-              Create shop
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-interface EditShopFormProps {
-  open: boolean
-  shop: Shop
-  onClose: () => void
-}
-
-function EditShopForm({ open, shop, onClose }: EditShopFormProps) {
-  const form = useForm<UpdateShopValues>({
-    resolver: zodResolver<UpdateShopValues>(updateShopSchema),
-    defaultValues: {
-      name: shop.name,
-      channelType: shop.channelType,
-      channelName: shop.channelName,
-      phone: toNullableString(shop.phone ?? null) ?? '',
-      address: toNullableString(shop.address ?? null) ?? '',
-      notes: toNullableString(shop.notes ?? null) ?? '',
-    },
-  })
   const updateShopMutation = useUpdateShop()
-  const { formState: { errors }, setValue } = form
-  const channelType = form.watch('channelType') ?? shop.channelType
 
-  async function onSubmit(data: UpdateShopValues) {
+  const { errors } = form.formState
+
+  function handleClose() {
+    // Drop a stale 409 banner, and clear any half-typed input for next open.
+    form.reset(formValues)
+    onClose()
+  }
+
+  async function onValid(values: ShopValues) {
+    form.clearErrors('root')
     try {
-      await updateShopMutation.mutateAsync({
-        id: shop.id,
-        body: {
-          name: data.name,
-          channelType: data.channelType,
-          channelName: data.channelName,
-          phone: data.phone ?? null,
-          address: data.address ?? null,
-          notes: data.notes ?? null,
-        },
-      })
-      toast.success('Shop updated')
-      onClose()
-    } catch (err) {
-      form.setError('root', { message: getApiErrorMessage(err) })
+      if (shop) {
+        await updateShopMutation.mutateAsync({ id: shop.id, body: toShopRequestBody(values) })
+        toast.success('Shop updated')
+      } else {
+        await createShopMutation.mutateAsync(toShopRequestBody(values))
+        toast.success('Shop created')
+      }
+      handleClose()
+    } catch (error) {
+      form.setError('root', { message: getApiErrorMessage(error) })
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+    <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
       <DialogContent className="sm:max-w-md">
-        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="flex flex-col gap-4">
+        <Form form={form} onValid={onValid}>
           <DialogHeader>
-            <DialogTitle>Edit shop</DialogTitle>
-            <DialogDescription>Update the shop details.</DialogDescription>
+            <DialogTitle>{isEditing ? 'Edit shop' : 'New shop'}</DialogTitle>
+            <DialogDescription>
+              {isEditing
+                ? 'Update the shop details.'
+                : 'Create a partner shop and its chat channel.'}
+            </DialogDescription>
           </DialogHeader>
 
-          <ShopFields
-            nameField={form.register('name')}
-            channelNameField={form.register('channelName')}
-            phoneField={form.register('phone')}
-            addressField={form.register('address')}
-            notesField={form.register('notes')}
-            nameError={errors.name?.message}
-            channelNameError={errors.channelName?.message}
-            channelTypeError={errors.channelType?.message}
-            channelType={channelType}
-            onChannelTypeChange={(value) => setValue('channelType', value, { shouldValidate: true })}
+          <FormBody>
+
+            <ShopFormFields />
+
+          </FormBody>
+
+          <FormAlert error={errors.root?.message} />
+
+          <FormFooter
+            submitLabel={isEditing ? 'Save changes' : 'Create shop'}
+            isSubmitting={createShopMutation.isPending || updateShopMutation.isPending}
           />
-
-          {errors.root && (
-            <div className="rounded-md bg-destructive/10 p-3">
-              <p className="text-sm text-destructive">{errors.root.message}</p>
-            </div>
-          )}
-
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline" />}>
-              Close
-            </DialogClose>
-            <Button type="submit" disabled={updateShopMutation.isPending}>
-              Save changes
-            </Button>
-          </DialogFooter>
-        </form>
+        </Form>
       </DialogContent>
     </Dialog>
-  )
-}
-
-/**
- * Two typed forms; create requires channelType (defaulted to VIBER), edit
- * already has it from the row.
- */
-export function ShopDialog({ state, onClose }: ShopDialogProps) {
-  return state.shop ? (
-    <EditShopForm
-      open={state.open}
-      shop={state.shop}
-      onClose={onClose}
-    />
-  ) : (
-    <CreateShopForm
-      open={state.open}
-      onClose={onClose}
-    />
   )
 }

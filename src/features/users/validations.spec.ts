@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { createUserSchema, updateUserSchema } from './validations'
+import { userSchema } from './validations'
+
+// Create requires a password; edit pins it to '' because it renders no such field.
+const createUserSchema = userSchema(false)
+const updateUserSchema = userSchema(true)
 
 describe('createUserSchema', () => {
-  const valid = { name: 'John', email: 'john@delivery.local', phone: null, roleId: 'r1', password: 'Password1' }
+  const valid = { name: 'John', email: 'john@delivery.local', phone: null, roleId: 'r1', password: 'Password1', status: 'ACTIVE' }
 
   it('accepts a valid create payload', () => {
     expect(createUserSchema.safeParse(valid).success).toBe(true)

@@ -1,32 +1,17 @@
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
-const CHANNEL_TYPE_OPTIONS = [
-  { value: 'VIBER', label: 'Viber' },
-  { value: 'TELEGRAM', label: 'Telegram' },
-] as const
-
-/** Base UI Select trigger resolves value → label via `items`. */
-const CHANNEL_TYPE_ITEMS: Record<string, string> = Object.fromEntries(
-  CHANNEL_TYPE_OPTIONS.map((option) => [option.value, option.label]),
-)
+import { FilterSelect } from '@/components/form/FilterSelect'
+import { CHANNEL_TYPE_OPTIONS, type ChannelType } from '../channel-types'
 
 interface ShopsToolbarProps {
   searchInput: string
-  channelType: 'VIBER' | 'TELEGRAM' | undefined
+  channelType: ChannelType | undefined
   hasFilters: boolean
   hasPendingChanges: boolean
   onSearchInputChange: (value: string) => void
   onSearchSubmit: () => void
-  onChannelTypeChange: (value: 'VIBER' | 'TELEGRAM' | undefined) => void
+  onChannelTypeChange: (value: ChannelType | undefined) => void
   onApply: () => void
   onReset: () => void
 }
@@ -57,24 +42,12 @@ export function ShopsToolbar({
       </div>
 
       <div className="flex items-center gap-2">
-        <Select
-          items={CHANNEL_TYPE_ITEMS}
-          value={channelType ?? ''}
-          onValueChange={(value) => {
-            if (value === 'VIBER' || value === 'TELEGRAM') onChannelTypeChange(value)
-          }}
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Channel" />
-          </SelectTrigger>
-          <SelectContent>
-            {CHANNEL_TYPE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <FilterSelect
+          value={channelType}
+          options={CHANNEL_TYPE_OPTIONS}
+          onChange={onChannelTypeChange}
+          placeholder="Channel"
+        />
 
         {hasFilters && (
           <Button variant="ghost" onClick={onReset}>Reset</Button>

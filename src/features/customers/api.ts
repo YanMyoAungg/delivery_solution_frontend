@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { http } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
-type Customer = components['schemas']['CustomerResponseDto']
+export type Customer = components['schemas']['CustomerResponseDto']
 type CustomerList = components['schemas']['CustomerListResponseDto']
 
 /**

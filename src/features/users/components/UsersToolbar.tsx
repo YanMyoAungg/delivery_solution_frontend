@@ -2,33 +2,33 @@ import { useMemo } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FilterSelect } from '@/components/form/FilterSelect'
+import { USER_STATUS_OPTIONS, type UserStatusValue } from '@/lib/constants/user-status'
 import type { components } from '@/types/api'
 
-type UserStatus = components['schemas']['UserStatus']
 type Role = components['schemas']['RoleResponseDto']
 
 /**
- * Base UI's `Select.Value` renders the raw value unless `Select.Root` is given
- * an `items` map to resolve labels from — the item children do not reach the
- * trigger. Static, so a module-level constant keeps the reference stable.
+ * This toolbar spells "no filter" as an explicit `ALL` row rather than a
+ * placeholder, so `ALL` is just the first option.
  */
-const STATUS_FILTER_ITEMS: Record<string, string> = {
-  ALL: 'All statuses',
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
-}
+const STATUS_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All statuses' },
+  ...USER_STATUS_OPTIONS,
+] as const
+
+type StatusFilterValue = 'ALL' | UserStatusValue
 
 interface UsersToolbarProps {
   searchInput: string
-  statusFilter: 'ALL' | UserStatus
+  statusFilter: StatusFilterValue
   roleFilter: string
   assignableRoles: Role[]
   hasFilters: boolean
   hasPendingChanges: boolean
   onSearchInputChange: (value: string) => void
   onSearchSubmit: () => void
-  onStatusFilterChange: (value: 'ALL' | UserStatus) => void
+  onStatusFilterChange: (value: StatusFilterValue) => void
   onRoleFilterChange: (value: string) => void
   onApply: () => void
   onReset: () => void
@@ -50,12 +50,11 @@ export function UsersToolbar({
   onReset,
 }: UsersToolbarProps) {
   // Keyed by id, so the label resolves for any role the caller passes in.
-  const roleFilterItems = useMemo(
-    () =>
-      Object.fromEntries([
-        ['ALL', 'All roles'],
-        ...assignableRoles.map((role) => [role.id, role.name]),
-      ]),
+  const roleFilterOptions = useMemo(
+    () => [
+      { value: 'ALL', label: 'All roles' },
+      ...assignableRoles.map((role) => ({ value: role.id, label: role.name })),
+    ],
     [assignableRoles],
   )
 
@@ -73,34 +72,21 @@ export function UsersToolbar({
         />
       </div>
 
-      <Select
-        items={STATUS_FILTER_ITEMS}
+      <FilterSelect
         value={statusFilter}
-        onValueChange={(value) => {
-          if (value) onStatusFilterChange(value as 'ALL' | UserStatus)
-        }}
-      >
-        <SelectTrigger aria-label="Filter by status" className="w-36">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ALL">All statuses</SelectItem>
-          <SelectItem value="ACTIVE">Active</SelectItem>
-          <SelectItem value="INACTIVE">Inactive</SelectItem>
-        </SelectContent>
-      </Select>
+        options={STATUS_FILTER_OPTIONS}
+        onChange={(value) => onStatusFilterChange(value ?? 'ALL')}
+        aria-label="Filter by status"
+        className="w-36"
+      />
 
-      <Select items={roleFilterItems} value={roleFilter} onValueChange={(value) => value && onRoleFilterChange(value)}>
-        <SelectTrigger aria-label="Filter by role" className="w-40">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ALL">All roles</SelectItem>
-          {assignableRoles.map((role) => (
-            <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <FilterSelect
+        value={roleFilter}
+        options={roleFilterOptions}
+        onChange={(value) => onRoleFilterChange(value ?? 'ALL')}
+        aria-label="Filter by role"
+        className="w-40"
+      />
 
       <Button variant="outline" onClick={onApply} disabled={!hasPendingChanges}>Apply</Button>
       {hasFilters && <Button variant="ghost" onClick={onReset}>Reset</Button>}

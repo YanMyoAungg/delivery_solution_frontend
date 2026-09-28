@@ -3,7 +3,7 @@ import { http } from '@/lib/api/client'
 import { rolesKeys } from '@/features/roles/api'
 import type { components } from '@/types/api'
 
-type User = components['schemas']['UserResponseDto']
+export type User = components['schemas']['UserResponseDto']
 type UserList = components['schemas']['UserListResponseDto']
 
 /**

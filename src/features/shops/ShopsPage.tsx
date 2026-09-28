@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { readApiError } from '@/lib/api/client'
-import { useShops, useDeleteShop, type ShopsFilters } from './api'
+import { useShops, useDeleteShop, type Shop, type ShopsFilters } from './api'
+import type { ChannelType } from './channel-types'
 import { ShopsToolbar } from './components/ShopsToolbar'
 import { ShopsTable } from './components/ShopsTable'
 import { ShopDialog } from './components/ShopDialog'
@@ -13,13 +14,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { PAGE_SIZE } from '@/lib/constants'
-import type { components } from '@/types/api'
-
-type Shop = components['schemas']['ShopResponseDto']
 
 export function ShopsPage() {
   const [filters, setFilters] = useState<ShopsFilters>({ page: 1, perPage: PAGE_SIZE })
-  const [channelType, setChannelType] = useState<'VIBER' | 'TELEGRAM' | undefined>(undefined)
+  const [channelType, setChannelType] = useState<ChannelType | undefined>(undefined)
   const [searchInput, setSearchInput] = useState('')
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -113,8 +111,8 @@ export function ShopsPage() {
       )}
 
       <ShopDialog
-        key={shopToEdit?.id ?? 'new'}
-        state={{ open: dialogOpen, shop: shopToEdit }}
+        open={dialogOpen}
+        shop={shopToEdit}
         onClose={() => { setDialogOpen(false); setShopToEdit(undefined) }}
       />
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { readApiError } from '@/lib/api/client'
 import { useCustomers, useDeleteCustomer, type CustomersFilters } from './api'
 import { CustomerDialog } from './components/CustomerDialog'
@@ -106,8 +106,8 @@ export function CustomersPage() {
       )}
 
       <CustomerDialog
-        key={customerToEdit?.id ?? 'new'}
-        state={{ open: dialogOpen, customer: customerToEdit }}
+        open={dialogOpen}
+        customer={customerToEdit}
         onClose={() => { setDialogOpen(false); setCustomerToEdit(undefined) }}
       />
 

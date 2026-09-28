@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { http } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
-type Shop = components['schemas']['ShopResponseDto']
+export type Shop = components['schemas']['ShopResponseDto']
 type ShopList = components['schemas']['ShopListResponseDto']
 type ShopChannelType = components['schemas']['ShopChannelType']
 

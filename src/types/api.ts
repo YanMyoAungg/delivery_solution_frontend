@@ -187,10 +187,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List shops with search, filters and pagination */
+        /** List shops with search and pagination */
         get: operations["ShopsController_list_v1"];
         put?: never;
-        /** Create a new shop */
+        /** Create a shop */
         post: operations["ShopsController_create_v1"];
         delete?: never;
         options?: never;
@@ -227,7 +227,7 @@ export interface paths {
         /** List customers with search and pagination */
         get: operations["CustomersController_list_v1"];
         put?: never;
-        /** Create a new customer */
+        /** Create a customer */
         post: operations["CustomersController_create_v1"];
         delete?: never;
         options?: never;
@@ -264,7 +264,7 @@ export interface paths {
         /** List riders with search, filters and pagination */
         get: operations["RidersController_list_v1"];
         put?: never;
-        /** Create a rider — creates a RIDER-role user row and the rider profile in one transaction */
+        /** Create a rider and its login account */
         post: operations["RidersController_create_v1"];
         delete?: never;
         options?: never;
@@ -279,16 +279,260 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a rider by id (id = the backing user id) */
+        /** Get a rider by id */
         get: operations["RidersController_get_v1"];
         put?: never;
         post?: never;
-        /** Delete a rider and its backing user row */
+        /** Delete a rider and its login account */
         delete: operations["RidersController_remove_v1"];
         options?: never;
         head?: never;
-        /** Update rider profile and/or whitelisted user fields (name, phone, status) */
+        /** Update a rider and its login account */
         patch: operations["RidersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List orders with filters and pagination */
+        get: operations["OrdersController_list_v1"];
+        put?: never;
+        /** Register an office-received order and assign a rider by township rotation */
+        post: operations["OrdersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an order status history */
+        get: operations["OrdersController_history_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an order by id with its history */
+        get: operations["OrdersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/townships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TownshipsController_list_v1"];
+        put?: never;
+        post: operations["TownshipsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/townships/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["TownshipsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/deliveries/{orderId}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DeliveriesController_assign_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deliveries/{id}/reassign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["DeliveriesController_reassign_v1"];
+        trace?: never;
+    };
+    "/api/v1/deliveries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DeliveriesController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deliveries/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DeliveriesController_complete_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deliveries/{id}/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DeliveriesController_fail_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{orderId}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrdersDeliveriesController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{orderId}/deliveries/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersDeliveriesController_retry_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders/me/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiderDeliveriesController_list_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rider/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiderBoardController_board_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rider/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RiderBoardController_dashboard_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -468,167 +712,463 @@ export interface components {
         ShopResponseDto: {
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             id: string;
-            /** @example Yangon Fresh Market */
+            /** @example Yangon Central Shop */
             name: string;
             /** @example 09123456789 */
-            phone: Record<string, never> | null;
-            /** @example No. 12, Bogyoke Road, Yangon */
-            address: Record<string, never> | null;
-            /** @example Preferred delivery contact: shop manager */
-            notes: Record<string, never> | null;
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example Deliver before 6pm */
+            notes?: Record<string, never> | null;
+            /** @example VIBER */
             channelType: components["schemas"]["ShopChannelType"];
-            /** @example Yangon Fresh Market Group */
+            /** @example YangonCentralShop */
             channelName: string;
-            /** @example 2026-09-17T10:00:00.000Z */
+            /** @example 2026-09-18T10:00:00.000Z */
             createdAt: string;
-            /** @example 2026-09-17T10:00:00.000Z */
+            /** @example 2026-09-18T10:00:00.000Z */
             updatedAt: string;
+        };
+        ShopListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
         };
         ShopListResponseDto: {
             data: components["schemas"]["ShopResponseDto"][];
-            meta: components["schemas"]["PaginationMetaDto"];
+            meta: components["schemas"]["ShopListMetaDto"];
         };
         CreateShopDto: {
-            /** @example Yangon Fresh Market */
+            /** @example Yangon Central Shop */
             name: string;
             /** @example 09123456789 */
             phone?: Record<string, never> | null;
-            /** @example No. 12, Bogyoke Road, Yangon */
-            address: Record<string, never> | null;
-            /** @example Preferred delivery contact: shop manager */
-            notes: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example Deliver before 6pm */
+            notes?: Record<string, never>;
+            /** @example VIBER */
             channelType: components["schemas"]["ShopChannelType"];
-            /** @example Yangon Fresh Market Group */
+            /** @example YangonCentralShop */
             channelName: string;
         };
         UpdateShopDto: {
-            /** @example Yangon Fresh Market Updated */
+            /** @example Yangon Central Shop */
             name?: string;
-            /** @example 09876543210 */
+            /** @example 09123456789 */
             phone?: Record<string, never> | null;
-            /** @example No. 34, Merchant Street, Yangon */
+            /** @example No. 1, Main Road */
             address?: Record<string, never> | null;
-            /** @example Updated points of contact */
-            notes?: Record<string, never> | null;
+            /** @example Deliver before 6pm */
+            notes?: Record<string, never>;
+            /** @example VIBER */
             channelType?: components["schemas"]["ShopChannelType"];
-            /** @example Yangon Fresh Market Group */
+            /** @example YangonCentralShop */
             channelName?: string;
         };
         CustomerResponseDto: {
-            /** Format: uuid */
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             id: string;
+            /** @example Aung Aung */
             name: string;
-            phone?: Record<string, never>;
-            address?: Record<string, never>;
-            notes?: Record<string, never>;
-            /** Format: date-time */
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example Prefers morning delivery */
+            notes?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
             createdAt: string;
-            /** Format: date-time */
+            /** @example 2026-09-18T10:00:00.000Z */
             updatedAt: string;
+        };
+        CustomerListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
         };
         CustomerListResponseDto: {
             data: components["schemas"]["CustomerResponseDto"][];
-            meta: components["schemas"]["PaginationMetaDto"];
+            meta: components["schemas"]["CustomerListMetaDto"];
         };
         CreateCustomerDto: {
-            /** @description Customer full name */
+            /** @example Aung Aung */
             name: string;
-            phone?: string;
-            address?: string;
-            notes?: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example Prefers morning delivery */
+            notes?: Record<string, never> | null;
         };
         UpdateCustomerDto: {
-            /** @description Customer full name */
+            /** @example Aung Aung */
             name?: string;
-            phone?: string;
-            address?: string;
-            notes?: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example Prefers morning delivery */
+            notes?: Record<string, never> | null;
         };
         /** @enum {string} */
         RiderVehicleType: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
-        RiderUserDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: email */
-            email: string;
-            phone: Record<string, never> | null;
-            /**
-             * @description UserStatus enum value
-             * @example ACTIVE
-             */
-            status: string;
-        };
         RiderResponseDto: {
-            /**
-             * Format: uuid
-             * @description Rider id (same as the user id)
-             */
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             userId: string;
-            licenseNo: Record<string, never> | null;
-            /** @default BIKE */
+            /** @example John Rider */
+            name: string;
+            /** @example john.rider@delivery.local */
+            email: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            status: components["schemas"]["UserStatus"];
+            /** @example BIKE */
             vehicleType: components["schemas"]["RiderVehicleType"];
-            vehiclePlate: Record<string, never> | null;
-            nrcNumber: Record<string, never> | null;
-            emergencyContactPhone: Record<string, never> | null;
-            isAvailable: boolean;
-            notes: Record<string, never> | null;
-            /** Format: date-time */
+            /** @example MDY-1234 */
+            vehiclePlate?: Record<string, never> | null;
+            /** @example DL-2024-99812 */
+            licenseNo?: Record<string, never> | null;
+            /** @example 09987654321 */
+            nrcNumber?: Record<string, never> | null;
+            /** @example 09111111111 */
+            emergencyContactPhone?: Record<string, never> | null;
+            /** @example Prefers north townships */
+            notes?: Record<string, never> | null;
+            /** @description Township ids this rider serves */
+            townshipIds: string[];
+            /** @example 2026-09-18T10:00:00.000Z */
             createdAt: string;
-            /** Format: date-time */
+            /** @example 2026-09-18T10:00:00.000Z */
             updatedAt: string;
-            user: components["schemas"]["RiderUserDto"];
+        };
+        RiderListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
         };
         RiderListResponseDto: {
             data: components["schemas"]["RiderResponseDto"][];
-            meta: components["schemas"]["PaginationMetaDto"];
+            meta: components["schemas"]["RiderListMetaDto"];
         };
         CreateRiderDto: {
-            /** @description Rider full name */
+            /** @example John Rider */
             name: string;
-            /** Format: email */
+            /** @example john.rider@delivery.local */
             email: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example StrongP@ssw0rd */
             password: string;
-            phone?: string;
             /**
-             * @description User status of the backing user row
              * @default ACTIVE
              * @enum {string}
              */
             status: "ACTIVE" | "INACTIVE";
-            /** @description Driving license number */
-            licenseNo?: string;
-            /**
-             * @default BIKE
-             * @enum {string}
-             */
-            vehicleType: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
-            /** @description Vehicle plate number */
-            vehiclePlate?: string;
-            /** @description National Registration Card number */
-            nrcNumber?: string;
-            /** @description Emergency contact phone number */
-            emergencyContactPhone?: string;
-            /**
-             * @description Whether the rider is currently available for deliveries
-             * @default true
-             */
-            isAvailable: boolean;
-            notes?: string;
+            /** @default BIKE */
+            vehicleType: components["schemas"]["RiderVehicleType"];
+            /** @example MDY-1234 */
+            vehiclePlate?: Record<string, never> | null;
+            /** @example DL-2024-99812 */
+            licenseNo?: Record<string, never> | null;
+            /** @example 09987654321 */
+            nrcNumber?: Record<string, never> | null;
+            /** @example 09111111111 */
+            emergencyContactPhone?: Record<string, never> | null;
+            /** @example Prefers north townships */
+            notes?: Record<string, never> | null;
+            /** @description Townships this rider serves */
+            townshipIds?: string[];
         };
         UpdateRiderDto: {
+            /** @example John Rider Updated */
             name?: string;
-            phone?: string;
+            /** @example john.updated@delivery.local */
+            email?: string;
+            /** @example 09876543210 */
+            phone?: Record<string, never> | null;
             /** @enum {string} */
             status?: "ACTIVE" | "INACTIVE";
-            licenseNo?: string;
+            /** @description Reset rider password */
+            password?: string;
+            vehicleType?: components["schemas"]["RiderVehicleType"];
+            /** @example MDY-1234 */
+            vehiclePlate?: Record<string, never> | null;
+            /** @example DL-2024-99812 */
+            licenseNo?: Record<string, never> | null;
+            /** @example 09987654321 */
+            nrcNumber?: Record<string, never> | null;
+            /** @example 09111111111 */
+            emergencyContactPhone?: Record<string, never> | null;
+            /** @example Prefers north townships */
+            notes?: Record<string, never> | null;
+            /** @description Replace township coverage */
+            townshipIds?: string[];
+        };
+        /** @enum {string} */
+        OrderStatus: "ASSIGNED" | "DELIVERED" | "FAILED";
+        OrderResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example ORD-01J8ZQ4C7M3W9X2K5T8R1V6B0P */
+            trackingCode: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            shopId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            customerId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            townshipId: string;
+            /** @example Hlaing */
+            townshipName: string;
+            riderId?: Record<string, never> | null;
+            riderName?: Record<string, never> | null;
+            riderPhone?: Record<string, never> | null;
+            /** @description Opaque package metadata; shape and physical units are not yet defined */
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @description Decimal string
+             * @example 0.00
+             */
+            deliveryFee: string;
+            /**
+             * @description Decimal string
+             * @example 0.00
+             */
+            codAmount: string;
+            status: components["schemas"]["OrderStatus"];
+            notes?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-18T10:00:00.000Z */
+            updatedAt: string;
+        };
+        OrderListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        OrderListResponseDto: {
+            data: components["schemas"]["OrderResponseDto"][];
+            meta: components["schemas"]["OrderListMetaDto"];
+        };
+        CreateOrderDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            townshipId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            shopId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            customerId: string;
+            /** @description Opaque package metadata; shape and physical units are not yet defined */
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @default 0
+             * @example 0.00
+             */
+            deliveryFee: string;
+            /**
+             * @default 0
+             * @example 0.00
+             */
+            codAmount: string;
+            notes?: Record<string, never> | null;
+        };
+        OrderHistoryResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            orderId: string;
+            fromStatus?: components["schemas"]["OrderStatus"] | null;
+            toStatus: components["schemas"]["OrderStatus"];
+            changedBy?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+        };
+        OrderDetailResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example ORD-01J8ZQ4C7M3W9X2K5T8R1V6B0P */
+            trackingCode: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            shopId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            customerId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            townshipId: string;
+            /** @example Hlaing */
+            townshipName: string;
+            riderId?: Record<string, never> | null;
+            riderName?: Record<string, never> | null;
+            riderPhone?: Record<string, never> | null;
+            /** @description Opaque package metadata; shape and physical units are not yet defined */
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @description Decimal string
+             * @example 0.00
+             */
+            deliveryFee: string;
+            /**
+             * @description Decimal string
+             * @example 0.00
+             */
+            codAmount: string;
+            status: components["schemas"]["OrderStatus"];
+            notes?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-18T10:00:00.000Z */
+            updatedAt: string;
+            history: components["schemas"]["OrderHistoryResponseDto"][];
+        };
+        TownshipResponseDto: {
+            id: string;
+            /** @example Hlaing */
+            name: string;
+            /** @description Whether an ACTIVE rider is assigned to this township */
+            selectable: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateTownshipDto: {
+            /** @example Hlaing */
+            name: string;
+        };
+        UpdateTownshipDto: {
+            /** @example Hlaing */
+            name?: string;
+        };
+        AssignDeliveryDto: {
+            riderId: string;
+        };
+        /** @enum {string} */
+        DeliveryStatus: "ASSIGNED" | "DELIVERED" | "FAILED";
+        /** @enum {string} */
+        FailureReason: "CUSTOMER_UNAVAILABLE" | "WRONG_ADDRESS" | "CUSTOMER_REFUSED" | "CUSTOMER_RESCHEDULED" | "DAMAGED_PACKAGE" | "OTHER";
+        /** @enum {string} */
+        DeliveryHistoryEvent: "ASSIGNED" | "REASSIGNED" | "DELIVERED" | "FAILED" | "RETRY_CREATED";
+        DeliveryHistoryResponseDto: {
+            id: string;
+            deliveryAttemptId: string;
+            event: components["schemas"]["DeliveryHistoryEvent"];
+            actorId?: Record<string, never> | null;
+            previousRiderId?: Record<string, never> | null;
+            newRiderId?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            createdAt: string;
+        };
+        DeliveryDetailResponseDto: {
+            id: string;
+            orderId: string;
+            riderId: string;
+            attemptNumber: number;
+            status: components["schemas"]["DeliveryStatus"];
+            failureReason?: components["schemas"]["FailureReason"] | null;
+            failureNote?: Record<string, never> | null;
+            assignedBy?: Record<string, never> | null;
+            assignedAt: string;
+            deliveredAt?: Record<string, never> | null;
+            failedAt?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+            history: components["schemas"]["DeliveryHistoryResponseDto"][];
+        };
+        FailDeliveryDto: {
+            reason: components["schemas"]["FailureReason"];
+            note?: Record<string, never> | null;
+        };
+        DeliveryResponseDto: {
+            id: string;
+            orderId: string;
+            riderId: string;
+            attemptNumber: number;
+            status: components["schemas"]["DeliveryStatus"];
+            failureReason?: components["schemas"]["FailureReason"] | null;
+            failureNote?: Record<string, never> | null;
+            assignedBy?: Record<string, never> | null;
+            assignedAt: string;
+            deliveredAt?: Record<string, never> | null;
+            failedAt?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        DeliveryListResponseDto: {
+            data: components["schemas"]["DeliveryResponseDto"][];
+        };
+        RetryDeliveryDto: {
+            riderId: string;
+        };
+        RiderBoardOrderDto: {
+            id: string;
+            trackingCode: string;
+            status: components["schemas"]["OrderStatus"];
+            townshipId: string;
+            townshipName: string;
+            shopName: string;
+            assignedRiderName?: Record<string, never> | null;
+            deliveryAttemptId?: string;
+            attemptNumber?: number;
+            isMine: boolean;
+            createdAt: string;
+            customerId?: string | null;
+            customerName?: string | null;
+            customerPhone?: Record<string, never> | null;
+            customerAddress?: Record<string, never> | null;
+            packageInfo?: Record<string, never> | null;
+            /** @example 0.00 */
+            deliveryFee?: string;
+            /** @example 0.00 */
+            codAmount?: string;
+            notes?: Record<string, never> | null;
+        };
+        RiderBoardMetaDto: {
+            page: number;
+            perPage: number;
+            total: number;
+            totalPages: number;
+        };
+        RiderBoardResponseDto: {
+            /** @example 2026-09-29 */
+            date: string;
             /** @enum {string} */
-            vehicleType?: "BIKE" | "MOTORBIKE" | "CAR" | "OTHER";
-            vehiclePlate?: string;
-            nrcNumber?: string;
-            emergencyContactPhone?: string;
-            isAvailable?: boolean;
-            notes?: string;
+            filter: "mine" | "all";
+            data: components["schemas"]["RiderBoardOrderDto"][];
+            meta: components["schemas"]["RiderBoardMetaDto"];
+        };
+        RiderDashboardResponseDto: {
+            /** @example 2026-09-29 */
+            date: string;
+            /** @description Assigned attempts in the date cohort that remain open */
+            assigned: number;
+            delivered: number;
+            failed: number;
+            /** @description Percentage from 0 to 100; zero when there are no completed attempts */
+            successRate: number;
+            /** @example 12000.00 */
+            codCollected: string;
+            /** @example 45000.00 */
+            codOutstanding: string;
         };
     };
     responses: never;
@@ -1015,9 +1555,8 @@ export interface operations {
             query?: {
                 page?: number;
                 perPage?: number;
-                /** @description Search by name, phone or channel name */
+                /** @description Search by shop name, phone or address */
                 search?: string;
-                channelType?: components["schemas"]["ShopChannelType"];
             };
             header?: never;
             path?: never;
@@ -1128,7 +1667,7 @@ export interface operations {
             query?: {
                 page?: number;
                 perPage?: number;
-                /** @description Search by name or phone */
+                /** @description Search by customer name, phone or address */
                 search?: string;
             };
             header?: never;
@@ -1240,14 +1779,9 @@ export interface operations {
             query?: {
                 page?: number;
                 perPage?: number;
-                /** @description Search by rider name, email or phone (on the user row) */
+                /** @description Search by rider name, email or phone */
                 search?: string;
-                /** @description Filter by vehicle type */
-                vehicleType?: string;
-                /** @description Filter by availability */
-                isAvailable?: boolean;
-                /** @description Filter by user status */
-                status?: string;
+                status?: components["schemas"]["UserStatus"];
             };
             header?: never;
             path?: never;
@@ -1349,6 +1883,399 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by exact/partial tracking code */
+                search?: string;
+                status?: components["schemas"]["OrderStatus"];
+                /** @description Filter by shop id */
+                shopId?: string;
+                /** @description Filter by customer id */
+                customerId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderListResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrderDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_history_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderHistoryResponseDto"][];
+                };
+            };
+        };
+    };
+    OrdersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDetailResponseDto"];
+                };
+            };
+        };
+    };
+    TownshipsController_list_v1: {
+        parameters: {
+            query?: {
+                /** @description Only return townships with an active rider */
+                selectable?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"][];
+                };
+            };
+        };
+    };
+    TownshipsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTownshipDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"];
+                };
+            };
+        };
+    };
+    TownshipsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTownshipDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveriesController_assign_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignDeliveryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveriesController_reassign_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignDeliveryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveriesController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveriesController_complete_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveriesController_fail_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FailDeliveryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersDeliveriesController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryListResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersDeliveriesController_retry_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetryDeliveryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryDetailResponseDto"];
+                };
+            };
+        };
+    };
+    RiderDeliveriesController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryListResponseDto"];
+                };
+            };
+        };
+    };
+    RiderBoardController_board_v1: {
+        parameters: {
+            query?: {
+                /** @description Office-local calendar date; defaults to today */
+                date?: string;
+                filter?: "mine" | "all";
+                page?: number;
+                perPage?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderBoardResponseDto"];
+                };
+            };
+        };
+    };
+    RiderBoardController_dashboard_v1: {
+        parameters: {
+            query?: {
+                /** @description Office-local calendar date; defaults to today */
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderDashboardResponseDto"];
                 };
             };
         };

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/lib/store/auth.store'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { filterAssignableRoles } from '@/lib/auth/filterAssignableRoles'
 import { readApiError } from '@/lib/api/client'
 import { useRoles } from '@/features/roles/api'
@@ -127,8 +127,8 @@ export function UsersPage() {
       )}
 
       <UserDialog
-        key={userToEdit?.id ?? 'new'}
-        state={{ open: dialogOpen, user: userToEdit }}
+        open={dialogOpen}
+        user={userToEdit}
         onClose={() => { setDialogOpen(false); setUserToEdit(undefined) }}
       />
 

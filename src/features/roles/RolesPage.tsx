@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, Lock } from 'lucide-react'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { useRoles, useDeleteRole } from './api'
 import { getApiErrorMessage } from '@/lib/api/client'
@@ -108,7 +108,6 @@ export function RolesPage() {
       )}
 
       <RoleDialog
-        key={roleToEdit?.id ?? 'new'}
         open={dialogOpen}
         role={roleToEdit}
         onClose={() => { setDialogOpen(false); setRoleToEdit(null) }}

@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { UserStatusValue } from '@/lib/constants/user-status'
 import { http } from '@/lib/api/client'
 import { usersKeys } from '@/features/users/api'
+import { townshipsKeys } from '@/features/townships/api'
 import type { components } from '@/types/api'
 
-type Rider = components['schemas']['RiderResponseDto']
+export type Rider = components['schemas']['RiderResponseDto']
 type RiderList = components['schemas']['RiderListResponseDto']
-type RiderVehicleType = components['schemas']['RiderVehicleType']
-type RiderStatus = 'ACTIVE' | 'INACTIVE'
+export type RiderVehicleType = components['schemas']['RiderVehicleType']
 
 /**
  * Explicit DTOs. Codegen stubs the nullable strings as `Record<string, never>`;
@@ -22,26 +23,26 @@ export interface CreateRiderBody {
   email: string
   password: string
   phone?: string | null
-  status?: RiderStatus
+  status?: UserStatusValue
   licenseNo?: string | null
   vehicleType: RiderVehicleType
   vehiclePlate?: string | null
   nrcNumber?: string | null
   emergencyContactPhone?: string | null
-  isAvailable: boolean
+  townshipIds?: string[]
   notes?: string | null
 }
 
 export interface UpdateRiderBody {
   name?: string
   phone?: string | null
-  status?: RiderStatus
+  status?: UserStatusValue
   licenseNo?: string | null
   vehicleType?: RiderVehicleType
   vehiclePlate?: string | null
   nrcNumber?: string | null
   emergencyContactPhone?: string | null
-  isAvailable?: boolean
+  townshipIds?: string[]
   notes?: string | null
 }
 
@@ -49,9 +50,7 @@ export interface RidersFilters {
   page: number
   perPage: number
   search?: string
-  vehicleType?: RiderVehicleType
-  isAvailable?: boolean
-  status?: RiderStatus
+  status?: UserStatusValue
 }
 
 export const ridersKeys = {
@@ -102,6 +101,7 @@ export function useCreateRider() {
       // A rider creates a backing user row → both lists stale.
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
+      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }
@@ -114,6 +114,7 @@ export function useUpdateRider() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
+      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }
@@ -125,6 +126,7 @@ export function useDeleteRider() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
+      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }
