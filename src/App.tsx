@@ -20,6 +20,7 @@ import { NotFoundPage } from '@/features/errors/NotFoundPage'
 import { TownshipsPage } from '@/features/townships/TownshipsPage'
 import { OrdersPage } from '@/features/orders/OrdersPage'
 import { RiderBoardPage } from '@/features/rider-board/RiderBoardPage'
+import { OfficeDashboardPage } from '@/features/dashboard/OfficeDashboardPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,9 @@ function AppRoutes() {
           <Route element={<AppShell />}>
             <Route element={<ProtectedRoute perm="users.read" />}>
               <Route path="/users" element={<UsersPage />} />
+            </Route>
+            <Route element={<ProtectedRoute perm="reports.read" />}>
+              <Route path="/dashboard" element={<OfficeDashboardPage />} />
             </Route>
             <Route element={<ProtectedRoute perm="roles.read" />}>
               <Route path="/roles" element={<RolesPage />} />

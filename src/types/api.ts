@@ -535,6 +535,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/office/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get read-only office operational dashboard aggregates */
+        get: operations["OfficeDashboardController_getDashboard_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -931,8 +948,16 @@ export interface components {
             trackingCode: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             shopId: string;
+            /** @example Township Shop */
+            shopName: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             customerId: string;
+            /** @example Township Customer */
+            customerName: string;
+            /** @example 09123456789 */
+            customerPhone?: Record<string, never> | null;
+            /** @example No. 12 Main Road */
+            customerAddress?: Record<string, never> | null;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             townshipId: string;
             /** @example Hlaing */
@@ -1013,8 +1038,16 @@ export interface components {
             trackingCode: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             shopId: string;
+            /** @example Township Shop */
+            shopName: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             customerId: string;
+            /** @example Township Customer */
+            customerName: string;
+            /** @example 09123456789 */
+            customerPhone?: Record<string, never> | null;
+            /** @example No. 12 Main Road */
+            customerAddress?: Record<string, never> | null;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             townshipId: string;
             /** @example Hlaing */
@@ -1169,6 +1202,58 @@ export interface components {
             codCollected: string;
             /** @example 45000.00 */
             codOutstanding: string;
+        };
+        OfficeDashboardSummaryDto: {
+            /** @example 24 */
+            ordersCreated: number;
+            /**
+             * @description Current assigned orders, across all dates
+             * @example 8
+             */
+            openAssignments: number;
+            /** @example 12 */
+            delivered: number;
+            /** @example 2 */
+            failed: number;
+            /**
+             * @description Percent of completed attempts delivered on the selected date
+             * @example 85.71
+             */
+            successRate: number;
+        };
+        OfficeDashboardOpenWorkDto: {
+            riderId: string;
+            riderName: string;
+            townshipId: string;
+            townshipName: string;
+            /** @example 4 */
+            count: number;
+        };
+        OfficeDashboardActivityDto: {
+            id: string;
+            orderId: string;
+            trackingCode: string;
+            townshipName: string;
+            riderName: Record<string, never> | null;
+            previousRiderName: Record<string, never> | null;
+            event: components["schemas"]["DeliveryHistoryEvent"];
+            createdAt: string;
+        };
+        OfficeDashboardFailedOrderDto: {
+            orderId: string;
+            trackingCode: string;
+            townshipName: string;
+            riderName: Record<string, never> | null;
+            attemptNumber: number;
+            failedAt: string;
+        };
+        OfficeDashboardResponseDto: {
+            /** @example 2026-10-03 */
+            date: string;
+            summary: components["schemas"]["OfficeDashboardSummaryDto"];
+            openWork: components["schemas"]["OfficeDashboardOpenWorkDto"][];
+            recentActivity: components["schemas"]["OfficeDashboardActivityDto"][];
+            failedOrders: components["schemas"]["OfficeDashboardFailedOrderDto"][];
         };
     };
     responses: never;
@@ -1892,7 +1977,7 @@ export interface operations {
             query?: {
                 page?: number;
                 perPage?: number;
-                /** @description Search by exact/partial tracking code */
+                /** @description Search by tracking code, customer name, or customer phone */
                 search?: string;
                 status?: components["schemas"]["OrderStatus"];
                 /** @description Filter by shop id */
@@ -2276,6 +2361,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiderDashboardResponseDto"];
+                };
+            };
+        };
+    };
+    OfficeDashboardController_getDashboard_v1: {
+        parameters: {
+            query?: {
+                /** @description Office-local calendar date; defaults to today */
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfficeDashboardResponseDto"];
                 };
             };
         };

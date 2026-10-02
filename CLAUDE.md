@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). Built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password, shops, riders, customers, township coverage/configuration, office order management, and the RIDER delivery board. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
+Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). Built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password, shops, riders, customers, township coverage/configuration, office order management/dashboard, and the RIDER delivery board. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
 
 **Locked decisions (user):**
 - **Vite + React SPA + TypeScript** — not Next.js (internal ops tool, pure JSON API, no SSR).
@@ -47,10 +47,12 @@ RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `u
 - `src/features/townships/` owns office township list/create/rename. The API's `selectable` field is derived from active rider coverage; it is read-only in the UI. Townships cannot be deleted.
 - `src/features/riders/` manages complete township coverage through `townshipIds`. Updating coverage replaces the whole set; inactive riders are not eligible for new order assignment. The flattened rider API's `id` is the account identity used for rider updates/deletion.
 - `src/features/orders/` owns office order creation/list/detail. Creation offers only `GET /townships?selectable=true` results, requires a township, and does not select a rider. The API performs per-township round-robin assignment. Show the returned township and rider in office surfaces and surface API errors when coverage changes before submit.
+- Office order detail is organized into labeled sections for order/status, customer and shop, delivery, package/notes, and order history. Keep new office order detail surfaces consistent with that grouping.
 - `src/features/rider-board/` is a RIDER-only route at `/rider`, outside the office `AppShell`. The authenticated root/login redirect sends RIDER users there. Rider APIs self-scope from the JWT; do not authorize by query params or request office orders for rider views. RIDER must not receive `orders.read`.
 - The rider board defaults to `filter=all`, and sends a calendar date string (`YYYY-MM-DD`) without converting it through UTC ISO slicing. Metrics and rows share the selected assignment date. COD values remain decimal strings; display formatting must not change values used in calculations.
 - Only `isMine === true`, `status === 'ASSIGNED'`, with a `deliveryAttemptId` may show complete/fail actions. Other rider rows are deliberately redacted routing context and read-only; do not show sensitive placeholders or fetch another endpoint to fill the omitted PII.
 - Order/delivery statuses are `ASSIGNED | DELIVERED | FAILED`. No unassigned pool, claim/start action, pickup flow, `OUT_FOR_DELIVERY`, `STARTED`, or `RETURNED` order state. Shift/manifest, custody-return, and failure-threshold workflows are deferred.
+- The office dashboard is a separate, read-only `/dashboard` surface gated by `reports.read`. The backend permits OWNER/ADMIN/OFFICER and denies RIDER. Follow `PLAN.md` and `../d_api/PLAN.md` (“Office dashboard — first slice COMPLETE”); do not reuse rider dashboard APIs for office totals, and do not present status-derived COD sums as cash collected/reconciled or invent on-time/custody metrics.
 
 ## Architecture (planned layout)
 
@@ -58,7 +60,7 @@ RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `u
 - `src/lib/store/` (zustand) — auth store: `token`, `user`, `permissions`, `setSession`, `clearSession`, `hasPermission(key: PermissionKey)`; token persisted in `localStorage`. `permissions` stays `string[]` (server data); `PermissionKey` is assignable to it.
 - `usePermission` hook + `<ProtectedRoute perm="users.read">`: route-level gate → 403 page; button/link-level gate hides element. Both take a `PermissionKey`, so a stale key fails to compile. Mirrors backend grants so UI hides what the API would 403.
 - `src/components/layout/AppShell` — sidebar (desktop ≥1024px, mobile collapsible drawer), topbar with role badge + dropdown (Change Password / Logout), `<Outlet/>`.
-- `src/features/auth|users|roles|permissions|settings|shops|riders|customers|townships|orders|rider-board/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types), optional **`mappers.ts`** (pure DTO↔form-state translation), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
+- `src/features/auth|users|roles|permissions|settings|shops|riders|customers|townships|orders|dashboard|rider-board/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types), optional **`mappers.ts`** (pure DTO↔form-state translation), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
 - `src/config/` — app-level static config (e.g. `src/config/navigation.ts` — sidebar `NAV_ITEMS` + `firstAllowedPath`). NOT in `lib/`.
 - `src/types/` — `api.ts` (codegen, read-only) + `permission.ts` (hand-written mirror of the backend's `permission-keys.ts`: `MODULE_ACTIONS`, `PermissionKey`, `ACTION_ORDER`). The catalog is fixed, so keys autocomplete at compile time; which cells *exist* still comes from the API response.
 - `src/components/ui/` — shadcn components: `button`, `input`, `label`, `card`, `dialog`, `table`, `dropdown-menu`, `badge`, `select`, `alert-dialog`, `sonner`, `skeleton`, `pagination`, `checkbox`.
@@ -104,9 +106,9 @@ Check the table at the start of every task touching UI; if a row matches, invoke
 
 | Task touches | Invoke |
 |---|---|
-| App screens, CRUD, forms, dashboards, components, responsive layouts | `ui-ux-pro-max` (or `ui-ux-pro-max:ui-styling` for styling-only) |
+| App screens, CRUD, forms, components, responsive layouts | `ui-ux-pro-max` (or `ui-ux-pro-max:ui-styling` for styling-only) |
 | Landing/marketing pages, visual polish, aesthetic direction | `taste` (on top of `ui-ux-pro-max`) |
-| Any chart, graph, KPI tile, data visualization | `dataviz` (before first chart line) |
+| Any dashboard metric summary, chart, graph, KPI tile, or data visualization | `data-visualization` (before implementation; confirm metric definitions against the API contract first) |
 | Logos, banners, decks, icon sets, brand assets | `ui-ux-pro-max:design` |
 | Library/framework/SDK docs question | `ctx7` CLI (see `~/.claude/rules/context7.md`) |
 | Code review / quality pass on changes | `code-review` |

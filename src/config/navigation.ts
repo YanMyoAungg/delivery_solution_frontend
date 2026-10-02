@@ -8,6 +8,7 @@ import {
   Bike,
   MapPinned,
   ClipboardList,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react";
 import type { PermissionKey } from "@/types/permission";
@@ -22,6 +23,7 @@ export interface NavItem {
 
 /** Single source of truth for sidebar + landing redirect. */
 export const NAV_ITEMS: NavItem[] = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "reports.read" },
   { to: "/users", label: "Users", icon: Users, permission: "users.read" },
   { to: "/roles", label: "Roles", icon: UserCog, permission: "roles.read" },
   { to: "/shops", label: "Shops", icon: Store, permission: "shops.read" },
