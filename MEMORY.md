@@ -1,2 +1,2 @@
-- [Refactor progress](refactor-progress.md) — d_frontend mid-refactor checkpoint, next is derive.spec + Phase 2 Users
-- [NavBar white-screen fix](navbar-white-screen-fix.md) — Base UI MenuGroupContext, unverified, re-test after restart
+- The old refactor checkpoint was removed: `refactor-progress.md` is absent and the note's “next” work is already present in the current feature tree.
+- The NavBar menu grouping is verified in `src/components/layout/NavBar.tsx`: its label and menu items are inside `DropdownMenuGroup`. The separate old fix note is absent.
