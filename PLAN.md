@@ -4,9 +4,10 @@ This plan tracks office and rider UI work against the API contract in `../d_api/
 
 ## Current status
 
-- **Foundation and administration:** COMPLETE (auth, users, roles/permissions, shops, customers, riders, township configuration).
-- **Office order operations:** COMPLETE (order creation, list/search, category-grouped details, customer/shop context, automatic rider assignment display).
-- **Rider delivery surface:** COMPLETE (`/rider`, date-aware board and dashboard, redacted colleague orders, own-order actions).
+- **Foundation and administration:** COMPLETE (auth, users, roles/permissions, shops, customers, riders, township configuration with a default delivery fee).
+- **Office order operations:** COMPLETE (order creation with a staff-selected active rider and an editable fee prefilled from the township default, list/search, category-grouped details, customer/shop context, township/rider display).
+- **Rider delivery surface:** COMPLETE (`/rider`, date-aware board and dashboard, own-order rows with full detail, own-order actions).
+- **Order-assignment revision:** COMPLETE. Township and rider are independent — staff choose the rider from the active-rider list, the rider list is the same for every township, and the township supplies a default delivery fee that can be overridden per order. Riders see only their own orders; there is no `mine|all` filter or colleague redaction. Order editing/reassignment remains out of scope.
 - **Office dashboard:** FIRST SLICE COMPLETE. Implementation is below and matches `../d_api/PLAN.md`.
 - **Returns, COD reconciliation, custody/sign-out, and the 5-of-10 rule:** not implemented; follow backend domain gates and do not represent these as current capabilities.
 

@@ -6,9 +6,9 @@ Vite + React + TypeScript operations SPA for the Delivery Solution API (`../d_ap
 
 - Authentication, user and role management, and role-permission grants.
 - Shop, customer, and rider administration.
-- Township management and rider coverage configuration.
-- Office order creation, automatic township round-robin assignment, order list, and details/history.
-- Rider-only delivery board with assignment-date dashboard, own/all township filters, and own assigned delivery completion/failure actions.
+- Township management with a default delivery fee.
+- Office order creation with an explicit active-rider selector and per-order delivery fee override, plus order list and details/history.
+- Rider-only delivery board with assignment-date dashboard and own assigned delivery completion/failure actions.
 
 ## Local development
 
@@ -41,10 +41,11 @@ pnpm codegen
 
 ## Phase 3.5 behavior
 
-- Office staff register an order after the package arrives at the office. Creation requires shop, customer, and a township with active rider coverage. The backend selects and assigns the rider; the normal create form has no rider selector.
-- Township `selectable` is derived from active rider coverage. Rider coverage updates replace the full township set; assigning no townships removes coverage.
+- Office staff register an order after the package arrives at the office. Creation requires a township, an active rider chosen from `GET /riders/assignable`, and shop/customer. Township and rider are independent: the rider list is the same for every township.
+- Each township carries a `defaultDeliveryFee`. Selecting a township prefills the order’s editable fee, and staff can override it for that order.
+- Townships and riders are not linked. Rider administration no longer manages township coverage.
 - Rider users are directed to `/rider`, outside the office `AppShell`. The board uses `YYYY-MM-DD` in the office timezone and defaults to `Asia/Yangon`.
-- Own assigned rows may expose delivery/customer details and delivery actions. Other riders’ rows are routing-only and read-only; frontend code must not fetch extra data to fill omitted fields.
+- Every rider-board row is the authenticated rider’s own order with full delivery/customer details and a delivery-attempt id; there is no colleague-order redaction or `mine`/`all` filter.
 - Valid order and delivery states are `ASSIGNED`, `DELIVERED`, and `FAILED`. There is no claim/start action or pickup, return, or shift workflow in this phase.
 
 ## Project conventions
