@@ -7,6 +7,7 @@ import { getApiErrorMessage } from '@/lib/api/client'
 import { login } from '@/features/auth/api'
 import { loginSchema, type LoginValues } from '@/features/auth/validations'
 import { useAuthStore } from '@/lib/store/auth.store'
+import { firstAllowedPath } from '@/config/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +16,9 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const token = useAuthStore((s) => s.token)
+  const currentUser = useAuthStore((s) => s.user)
   const setSession = useAuthStore((s) => s.setSession)
+  const hasPermission = useAuthStore((s) => s.hasPermission)
 
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,19 +30,26 @@ export function LoginPage() {
 
   const { formState: { errors } } = form
 
-  if (token) {
-    const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/users'
-    return <Navigate to={from} replace />
-  }
+  const requestedPath = (location.state as { from?: { pathname: string } } | null)?.from?.pathname
+  const from = currentUser?.role === 'SHOP'
+    ? '/shop'
+    : requestedPath?.startsWith('/shop')
+      ? firstAllowedPath(hasPermission)
+      : requestedPath ?? firstAllowedPath(hasPermission)
 
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/users'
+  if (token) return <Navigate to={from} replace />
 
   async function onSubmit(data: LoginValues) {
     setIsSubmitting(true)
     try {
       const response = await login(data)
       setSession(response.user, response.permissions, response.accessToken)
-      navigate(from, { replace: true })
+      const destination = response.user.role === 'SHOP'
+        ? '/shop'
+        : from.startsWith('/shop')
+          ? firstAllowedPath((permission) => response.user.role === 'OWNER' || response.permissions.includes(permission))
+          : from
+      navigate(destination, { replace: true })
     } catch (err) {
       const apiError = getApiErrorMessage(err)
       form.setError('root', { message: apiError === 'Unauthorized' ? 'Invalid email or password' : apiError })

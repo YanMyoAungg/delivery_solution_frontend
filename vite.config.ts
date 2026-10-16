@@ -13,6 +13,9 @@ export default defineConfig({
     },
   },
   server: {
+    watch: {
+      ignored: ['**/.playwright-mcp/**'],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

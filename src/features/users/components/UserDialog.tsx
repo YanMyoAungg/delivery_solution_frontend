@@ -7,6 +7,7 @@ import { filterAssignableRoles } from '@/lib/auth/filterAssignableRoles'
 import { getApiErrorMessage } from '@/lib/api/client'
 import { toNullableString } from '@/lib/nullable'
 import { useRoles } from '@/features/roles/api'
+import { useContacts, useShop, type ContactRecord, type ShopRecord } from '@/features/operations/api'
 import { useCreateUser, useUpdateUser } from '../api'
 import {
   createUserSchema,
@@ -14,6 +15,7 @@ import {
   type CreateUserValues,
   type UpdateUserValues,
 } from '../validations'
+import type { UserResponseDto } from '@/types/user'
 import type { components } from '@/types/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,7 +37,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
-type User = components['schemas']['UserResponseDto']
+type User = UserResponseDto
 type Role = components['schemas']['RoleResponseDto']
 
 /**
@@ -73,6 +75,12 @@ interface UserFieldsProps {
   assignableRoles: Role[]
   /** Role id → role name, for every role (not just the assignable ones). */
   roleItems: Record<string, string>
+  shopId: string
+  shopError?: string
+  isShopRole: boolean
+  shops: ContactRecord[]
+  hasFreeShops: boolean
+  onShopChange: (shopId: string) => void
 }
 
 /**
@@ -91,6 +99,12 @@ function UserFields({
   onRoleChange,
   assignableRoles,
   roleItems,
+  shopId,
+  shopError,
+  isShopRole,
+  shops,
+  hasFreeShops,
+  onShopChange,
 }: UserFieldsProps) {
   return (
     <>
@@ -135,6 +149,16 @@ function UserFields({
         )}
         {roleError && <p className="text-xs text-destructive">{roleError}</p>}
       </div>
+
+      {isShopRole && <div className="flex flex-col gap-2">
+        <Label htmlFor="user-shop">Shop (required)</Label>
+        <select id="user-shop" required value={shopId} onChange={(event) => onShopChange(event.target.value)} className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">
+          <option value="">Select a shop</option>
+          {shops.map((shop) => <option key={shop.id} value={shop.id}>{shop.name}</option>)}
+        </select>
+        {!hasFreeShops && <p className="text-xs text-muted-foreground">Every shop already has a login. Create a shop first.</p>}
+        {shopError && <p className="text-xs text-destructive">{shopError}</p>}
+      </div>}
     </>
   )
 }
@@ -143,10 +167,12 @@ interface CreateUserFormProps {
   open: boolean
   assignableRoles: Role[]
   roleItems: Record<string, string>
+  shops: ContactRecord[]
+  hasFreeShops: boolean
   onClose: () => void
 }
 
-function CreateUserForm({ open, assignableRoles, roleItems, onClose }: CreateUserFormProps) {
+function CreateUserForm({ open, assignableRoles, roleItems, shops, hasFreeShops, onClose }: CreateUserFormProps) {
   const form = useForm<CreateUserValues>({
     resolver: zodResolver<CreateUserValues>(createUserSchema),
     defaultValues: { name: '', email: '', phone: '', roleId: '', password: '' },
@@ -154,14 +180,21 @@ function CreateUserForm({ open, assignableRoles, roleItems, onClose }: CreateUse
   const createUserMutation = useCreateUser()
   const { formState: { errors } } = form
   const roleId = useWatch({ control: form.control, name: 'roleId' })
+  const shopId = useWatch({ control: form.control, name: 'shopId' })
+  const isShopRole = assignableRoles.find((role) => role.id === roleId)?.name === 'SHOP'
 
   async function onSubmit(data: CreateUserValues) {
+    if (isShopRole && !data.shopId) {
+      form.setError('shopId', { message: 'Select a shop for this user' })
+      return
+    }
     try {
       await createUserMutation.mutateAsync({
         name: data.name,
         email: data.email,
         phone: data.phone || null,
         roleId: data.roleId,
+        shopId: isShopRole ? data.shopId : undefined,
         password: data.password,
       })
       toast.success('User created')
@@ -193,6 +226,12 @@ function CreateUserForm({ open, assignableRoles, roleItems, onClose }: CreateUse
             }
             assignableRoles={assignableRoles}
             roleItems={roleItems}
+            shopId={shopId ?? ''}
+            shopError={errors.shopId?.message}
+            isShopRole={isShopRole}
+            shops={shops}
+            hasFreeShops={hasFreeShops}
+            onShopChange={(value) => { form.clearErrors('shopId'); void form.setValue('shopId', value, { shouldValidate: true }) }}
           />
 
           <div className="flex flex-col gap-2">
@@ -220,7 +259,7 @@ function CreateUserForm({ open, assignableRoles, roleItems, onClose }: CreateUse
             <DialogClose render={<Button type="button" variant="outline" />}>
               Close
             </DialogClose>
-            <Button type="submit" disabled={createUserMutation.isPending}>
+            <Button type="submit" disabled={createUserMutation.isPending || (isShopRole && !hasFreeShops)}>
               Create user
             </Button>
           </DialogFooter>
@@ -235,10 +274,13 @@ interface EditUserFormProps {
   user: User
   assignableRoles: Role[]
   roleItems: Record<string, string>
+  shops: ContactRecord[]
+  hasFreeShops: boolean
+  currentShop?: ShopRecord
   onClose: () => void
 }
 
-function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditUserFormProps) {
+function EditUserForm({ open, user, assignableRoles, roleItems, shops, hasFreeShops, currentShop, onClose }: EditUserFormProps) {
   const form = useForm<UpdateUserValues>({
     resolver: zodResolver<UpdateUserValues>(updateUserSchema),
     defaultValues: {
@@ -246,15 +288,22 @@ function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditU
       email: user.email,
       phone: toNullableString(user.phone ?? null) ?? '',
       roleId: user.roleId,
+      shopId: typeof user.shopId === 'string' ? user.shopId : '',
       status: user.status,
     },
   })
   const updateUserMutation = useUpdateUser()
   const { formState: { errors } } = form
   const roleId = useWatch({ control: form.control, name: 'roleId' })
+  const shopId = useWatch({ control: form.control, name: 'shopId' })
+  const isShopRole = assignableRoles.find((role) => role.id === roleId)?.name === 'SHOP'
   const status = useWatch({ control: form.control, name: 'status' })
 
   async function onSubmit(data: UpdateUserValues) {
+    if (isShopRole && !data.shopId) {
+      form.setError('shopId', { message: 'Select a shop for this user' })
+      return
+    }
     try {
       await updateUserMutation.mutateAsync({
         id: user.id,
@@ -263,6 +312,7 @@ function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditU
           email: data.email,
           phone: data.phone || null,
           roleId: data.roleId,
+          shopId: isShopRole ? data.shopId : null,
           status: data.status,
         },
       })
@@ -295,6 +345,12 @@ function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditU
             }
             assignableRoles={assignableRoles}
             roleItems={roleItems}
+            shopId={shopId ?? ''}
+            shopError={errors.shopId?.message}
+            isShopRole={isShopRole}
+            shops={currentShop && !shops.some((shop) => shop.id === currentShop.id) ? [...shops, currentShop] : shops}
+            hasFreeShops={hasFreeShops}
+            onShopChange={(value) => { form.clearErrors('shopId'); void form.setValue('shopId', value, { shouldValidate: true }) }}
           />
 
           <div className="flex flex-col gap-2">
@@ -334,7 +390,7 @@ function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditU
             <DialogClose render={<Button type="button" variant="outline" />}>
               Close
             </DialogClose>
-            <Button type="submit" disabled={updateUserMutation.isPending}>
+            <Button type="submit" disabled={updateUserMutation.isPending || (isShopRole && shops.length === 0 && !currentShop)}>
               Save changes
             </Button>
           </DialogFooter>
@@ -353,6 +409,10 @@ function EditUserForm({ open, user, assignableRoles, roleItems, onClose }: EditU
 export function UserDialog({ state, onClose }: UserDialogProps) {
   const currentUser = useAuthStore((store) => store.user)
   const { data: roles = [] } = useRoles()
+  const { data: shopPage } = useContacts('shops', { page: 1, perPage: 100, hasLogin: false })
+  const shops = shopPage?.data ?? []
+  const currentShopId = typeof state.user?.shopId === 'string' ? state.user.shopId : undefined
+  const { data: currentShop } = useShop(currentShopId)
   const assignableRoles = useMemo(
     () => filterAssignableRoles(roles, currentUser),
     [roles, currentUser],
@@ -372,6 +432,9 @@ export function UserDialog({ state, onClose }: UserDialogProps) {
       user={state.user}
       assignableRoles={assignableRoles}
       roleItems={roleItems}
+      shops={shops}
+      hasFreeShops={shops.length > 0}
+      currentShop={currentShop}
       onClose={onClose}
     />
   ) : (
@@ -379,6 +442,8 @@ export function UserDialog({ state, onClose }: UserDialogProps) {
       open={state.open}
       assignableRoles={assignableRoles}
       roleItems={roleItems}
+      shops={shops}
+      hasFreeShops={shops.length > 0}
       onClose={onClose}
     />
   )

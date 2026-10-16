@@ -180,6 +180,764 @@ export interface paths {
         patch: operations["RolesController_update_v1"];
         trace?: never;
     };
+    "/api/v1/shops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List shops with search and pagination */
+        get: operations["ShopsController_list_v1"];
+        put?: never;
+        /** Create a shop */
+        post: operations["ShopsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shops/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a shop by id */
+        get: operations["ShopsController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a shop */
+        delete: operations["ShopsController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a shop */
+        patch: operations["ShopsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List customers with search and pagination */
+        get: operations["CustomersController_list_v1"];
+        put?: never;
+        /** Create a customer */
+        post: operations["CustomersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a customer by id */
+        get: operations["CustomersController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a customer */
+        delete: operations["CustomersController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a customer */
+        patch: operations["CustomersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/riders/me/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the authenticated rider’s assigned orders */
+        get: operations["RidersController_listMyOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders/me/orders/{id}/delivered": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit an owned order delivery for office approval */
+        post: operations["RidersController_submitDelivered_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List riders with search, filters and pagination */
+        get: operations["RidersController_list_v1"];
+        put?: never;
+        /** Create a rider and its login account */
+        post: operations["RidersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a rider by id */
+        get: operations["RidersController_get_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a rider and its login account */
+        delete: operations["RidersController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a rider and its login account */
+        patch: operations["RidersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List orders with filters and pagination */
+        get: operations["OrdersController_list_v1"];
+        put?: never;
+        /** Create an order using township defaults where available */
+        post: operations["OrdersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrdersController_getAudit_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrdersController_history_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_assign_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/postpone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_postpone_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_cancel_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_returnOrder_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_approve_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/send-back": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_sendBack_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/mark-delivered": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrdersController_markPartnerDelivered_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an order and its status history */
+        get: operations["OrdersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["OrdersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/ways": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List rider ways with date and derived-state filters */
+        get: operations["WaysController_list_v1"];
+        put?: never;
+        /** Close the rider’s current way today and start a new one */
+        post: operations["WaysController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ways/settings/commission-per-way": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["WaysController_getCommissionRate_v1"];
+        put: operations["WaysController_updateCommissionRate_v1"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ways/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["WaysController_get_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ways/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["WaysController_close_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ways/{id}/move-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["WaysController_moveOrders_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ways/{id}/pay-anyway": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["WaysController_payAnyway_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/townships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TownshipsController_list_v1"];
+        put?: never;
+        post: operations["TownshipsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/townships/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TownshipsController_get_v1"];
+        put?: never;
+        post?: never;
+        delete: operations["TownshipsController_remove_v1"];
+        options?: never;
+        head?: never;
+        patch: operations["TownshipsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/delivery-partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DeliveryPartnersController_list_v1"];
+        put?: never;
+        post: operations["DeliveryPartnersController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/delivery-partners/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DeliveryPartnersController_get_v1"];
+        put?: never;
+        post?: never;
+        delete: operations["DeliveryPartnersController_remove_v1"];
+        options?: never;
+        head?: never;
+        patch: operations["DeliveryPartnersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/reports/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List office orders with filtered totals */
+        get: operations["ReportsController_getOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/orders/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export office order report as CSV or XLSX */
+        get: operations["ReportsController_exportOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/shop-statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get office-level shop statement */
+        get: operations["ReportsController_getShopStatement_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/shop-statement/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export shop statement as CSV or XLSX */
+        get: operations["ReportsController_exportShopStatement_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/rider-collection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get expected rider COD collections by local date */
+        get: operations["ReportsController_getRiderCollection_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/rider-collection/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export rider collection report as CSV or XLSX */
+        get: operations["ReportsController_exportRiderCollection_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/rider-payout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get rider payout by way state */
+        get: operations["ReportsController_getRiderPayout_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/rider-payout/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export rider payout report as CSV or XLSX */
+        get: operations["ReportsController_exportRiderPayout_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/office-dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get office KPI and chart data */
+        get: operations["ReportsController_getOfficeDashboard_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/riders/me/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated rider’s own dashboard */
+        get: operations["RiderDashboardController_getDashboard_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the authenticated shop user’s orders */
+        get: operations["ShopPortalController_getOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/orders/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export the authenticated shop user’s orders as CSV or XLSX */
+        get: operations["ShopPortalController_exportOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a shop order and shop-visible status history */
+        get: operations["ShopPortalController_getOrder_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get shop order counts, settlement totals, and daily status series */
+        get: operations["ShopPortalController_getDashboard_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/statement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated shop’s statement */
+        get: operations["ShopPortalController_getStatement_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shop/statement/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export the authenticated shop’s statement as CSV or XLSX */
+        get: operations["ShopPortalController_exportStatement_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -225,6 +983,7 @@ export interface components {
             roleId: string;
             /** @example OWNER */
             role: string;
+            shopId: Record<string, never> | null;
             /** @example ACTIVE */
             status: components["schemas"]["UserStatus"];
             /** @example 2026-09-14T10:00:00.000Z */
@@ -273,6 +1032,8 @@ export interface components {
             phone?: Record<string, never> | null;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             roleId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            shopId?: Record<string, never> | null;
             /** @example StrongP@ssw0rd */
             password: string;
             /**
@@ -290,6 +1051,7 @@ export interface components {
             phone?: Record<string, never> | null;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             roleId?: string;
+            shopId?: Record<string, never> | null;
             status?: components["schemas"]["UserStatus"];
             /** @description Reset user password (min 8 characters) */
             password?: string;
@@ -351,6 +1113,809 @@ export interface components {
         UpdateRoleResponseDto: {
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             id: string;
+        };
+        ShopResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example Yangon Central Shop */
+            name: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example false */
+            hasLogin: boolean;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-18T10:00:00.000Z */
+            updatedAt: string;
+        };
+        ShopListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        ShopListResponseDto: {
+            data: components["schemas"]["ShopResponseDto"][];
+            meta: components["schemas"]["ShopListMetaDto"];
+        };
+        CreateShopDto: {
+            /** @example Yangon Central Shop */
+            name: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+        };
+        UpdateShopDto: {
+            /** @example Yangon Central Shop */
+            name?: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+        };
+        CustomerResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example Aung Aung */
+            name: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-18T10:00:00.000Z */
+            updatedAt: string;
+        };
+        CustomerListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        CustomerListResponseDto: {
+            data: components["schemas"]["CustomerResponseDto"][];
+            meta: components["schemas"]["CustomerListMetaDto"];
+        };
+        CreateCustomerDto: {
+            /** @example Aung Aung */
+            name: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+        };
+        UpdateCustomerDto: {
+            /** @example Aung Aung */
+            name?: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example No. 1, Main Road */
+            address?: Record<string, never> | null;
+        };
+        RiderOrderResponseDto: {
+            id: string;
+            trackingCode: string;
+            customerName: string;
+            customerPhone: Record<string, never> | null;
+            customerAddress: Record<string, never> | null;
+            townshipName: Record<string, never> | null;
+            notes: Record<string, never> | null;
+            /** @example 47000.00 */
+            packagePrice: string;
+            /** @example 3500.00 */
+            deliveryFee: string;
+            /** @example 50500.00 */
+            codToCollect: string;
+            /** @enum {string} */
+            status: "ASSIGNED";
+            /** Format: uuid */
+            wayId: Record<string, never> | null;
+            /** @example 2026-10-16 · 1 */
+            wayLabel: Record<string, never> | null;
+        };
+        /** @enum {string} */
+        OrderStatus: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+        RiderDeliveredResponseDto: {
+            id: string;
+            status: components["schemas"]["OrderStatus"];
+            deliveredAt: string;
+        };
+        RiderResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            userId: string;
+            /** @example John Rider */
+            name: string;
+            /** @example john.rider@delivery.local */
+            email: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            status: components["schemas"]["UserStatus"];
+            /** @example 600.00 */
+            commissionPerWayOverride?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+            /** @example 2026-09-18T10:00:00.000Z */
+            updatedAt: string;
+        };
+        RiderListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        RiderListResponseDto: {
+            data: components["schemas"]["RiderResponseDto"][];
+            meta: components["schemas"]["RiderListMetaDto"];
+        };
+        CreateRiderDto: {
+            /** @example John Rider */
+            name: string;
+            /** @example john.rider@delivery.local */
+            email: string;
+            /** @example 09123456789 */
+            phone?: Record<string, never> | null;
+            /** @example StrongP@ssw0rd */
+            password: string;
+            /**
+             * @default ACTIVE
+             * @enum {string}
+             */
+            status: "ACTIVE" | "INACTIVE";
+        };
+        UpdateRiderDto: {
+            /** @example John Rider Updated */
+            name?: string;
+            /** @example john.updated@delivery.local */
+            email?: string;
+            /** @example 09876543210 */
+            phone?: Record<string, never> | null;
+            /** @enum {string} */
+            status?: "ACTIVE" | "INACTIVE";
+            /** @description Reset rider password */
+            password?: string;
+            /** @example 600.00 */
+            commissionPerWayOverride?: Record<string, never> | null;
+        };
+        OrderResponseDto: {
+            id: string;
+            trackingCode: string;
+            shopId: string;
+            customerId: string;
+            townshipId?: Record<string, never> | null;
+            /** @enum {string|null} */
+            assigneeType?: "RIDER" | "PARTNER" | null;
+            riderId?: Record<string, never> | null;
+            /** Format: uuid */
+            wayId?: Record<string, never> | null;
+            partnerId?: Record<string, never> | null;
+            partnerTrackingNo?: Record<string, never> | null;
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @description Decimal string
+             * @example 47000.00
+             */
+            packagePrice: string;
+            /**
+             * @description Decimal string
+             * @example 3500.00
+             */
+            deliveryFee: string;
+            isPackagePaidToShop: boolean;
+            isFeePaidToShop: boolean;
+            /** @description Internal partner cost; not exposed to shop users */
+            partnerFee: string;
+            /** @example 2026-10-20 */
+            estimatedDeliveryDate?: Record<string, never> | null;
+            deliveredAt?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            cancelReason?: Record<string, never> | null;
+            status: components["schemas"]["OrderStatus"];
+            notes?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        OrderListMetaDto: {
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            perPage: number;
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        OrderListResponseDto: {
+            data: components["schemas"]["OrderResponseDto"][];
+            meta: components["schemas"]["OrderListMetaDto"];
+        };
+        CreateOrderDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            shopId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            customerId: string;
+            townshipId?: Record<string, never> | null;
+            /** @description Omitted uses the township default; null leaves the order pending. */
+            riderId?: Record<string, never> | null;
+            /** @description Omitted uses the township default; null leaves the order pending. */
+            partnerId?: Record<string, never> | null;
+            /** @description Opaque package metadata */
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @default 0
+             * @example 47000.00
+             */
+            packagePrice: string;
+            /**
+             * @description Overrides the township default fee
+             * @example 3500.00
+             */
+            deliveryFee?: string;
+            /** @default false */
+            isPackagePaidToShop: boolean;
+            /** @default false */
+            isFeePaidToShop: boolean;
+            /**
+             * @default 0
+             * @example 500.00
+             */
+            partnerFee: string;
+            /** @example 2026-10-20 */
+            estimatedDeliveryDate?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            /** @description Partner-provided tracking reference */
+            partnerTrackingNo?: Record<string, never> | null;
+            notes?: Record<string, never> | null;
+        };
+        OrderFieldAuditResponseDto: {
+            id: string;
+            orderId: string;
+            field: string;
+            oldValue?: Record<string, never> | null;
+            newValue?: Record<string, never> | null;
+            actorId?: Record<string, never> | null;
+            reason?: Record<string, never> | null;
+            createdAt: string;
+        };
+        OrderHistoryResponseDto: {
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            id: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            orderId: string;
+            fromStatus?: components["schemas"]["OrderStatus"] | null;
+            toStatus: components["schemas"]["OrderStatus"];
+            changedBy?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            /** @description Shop-visible state-change reason */
+            reason?: Record<string, never> | null;
+            /** @description Internal-only state-change note */
+            internalNote?: Record<string, never> | null;
+            previousAssignee?: Record<string, never> | null;
+            newAssignee?: Record<string, never> | null;
+            /** @example 2026-09-18T10:00:00.000Z */
+            createdAt: string;
+        };
+        AssignOrderDto: {
+            riderId?: Record<string, never> | null;
+            partnerId?: Record<string, never> | null;
+        };
+        OrderReasonDto: {
+            reason: string;
+        };
+        SendBackOrderDto: {
+            /** @description Reason visible to the shop */
+            reason: string;
+            /** @description Internal note, not visible to the shop */
+            internalNote: string;
+        };
+        UpdateOrderDto: {
+            shopId?: string;
+            customerId?: string;
+            townshipId?: Record<string, never> | null;
+            riderId?: Record<string, never> | null;
+            partnerId?: Record<string, never> | null;
+            partnerTrackingNo?: Record<string, never> | null;
+            packageInfo?: Record<string, never> | null;
+            packagePrice?: string;
+            deliveryFee?: string;
+            isPackagePaidToShop?: boolean;
+            isFeePaidToShop?: boolean;
+            partnerFee?: string;
+            estimatedDeliveryDate?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            notes?: Record<string, never> | null;
+            /** @description Apply the new township default delivery fee */
+            applyTownshipFee?: boolean;
+            /** @description Apply the new township default assignee */
+            applyTownshipAssignee?: boolean;
+            /** @description Audit reason for changed fields */
+            reason?: Record<string, never> | null;
+        };
+        OrderDetailResponseDto: {
+            id: string;
+            trackingCode: string;
+            shopId: string;
+            customerId: string;
+            townshipId?: Record<string, never> | null;
+            /** @enum {string|null} */
+            assigneeType?: "RIDER" | "PARTNER" | null;
+            riderId?: Record<string, never> | null;
+            /** Format: uuid */
+            wayId?: Record<string, never> | null;
+            partnerId?: Record<string, never> | null;
+            partnerTrackingNo?: Record<string, never> | null;
+            packageInfo?: Record<string, never> | null;
+            /**
+             * @description Decimal string
+             * @example 47000.00
+             */
+            packagePrice: string;
+            /**
+             * @description Decimal string
+             * @example 3500.00
+             */
+            deliveryFee: string;
+            isPackagePaidToShop: boolean;
+            isFeePaidToShop: boolean;
+            /** @description Internal partner cost; not exposed to shop users */
+            partnerFee: string;
+            /** @example 2026-10-20 */
+            estimatedDeliveryDate?: Record<string, never> | null;
+            deliveredAt?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            cancelReason?: Record<string, never> | null;
+            status: components["schemas"]["OrderStatus"];
+            notes?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+            history: components["schemas"]["OrderHistoryResponseDto"][];
+        };
+        WayResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            riderId: string;
+            riderName: string;
+            /**
+             * Format: date
+             * @example 2026-10-16
+             */
+            wayDate: string;
+            /** @example 1 */
+            sequence: number;
+            /** @example 500.00 */
+            commissionRate: string;
+            isOpen: boolean;
+            /** @enum {string} */
+            state: "EMPTY" | "PENDING_APPROVAL" | "EARNED" | "PAID_ANYWAY";
+            orderCount: number;
+            /** @example 500.00 */
+            commissionAmount: string;
+            /** @example 0.00 */
+            pendingAmount: string;
+            isPaidWithoutDelivery: boolean;
+            payAnywayReason: Record<string, never> | null;
+            /** Format: uuid */
+            payAnywayBy: Record<string, never> | null;
+            /** Format: date-time */
+            payAnywayAt: Record<string, never> | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CommissionRateResponseDto: {
+            /** @example commissionPerWay */
+            key: string;
+            /** @example 500.00 */
+            value: string;
+        };
+        UpdateCommissionRateDto: {
+            /** @example 500.00 */
+            value: string;
+        };
+        CreateWayDto: {
+            /** Format: uuid */
+            riderId: string;
+        };
+        WayOrderResponseDto: {
+            /** Format: uuid */
+            id: string;
+            trackingCode: string;
+            /** @enum {string} */
+            status: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+            /** Format: uuid */
+            wayId: Record<string, never> | null;
+            /** Format: uuid */
+            riderId: Record<string, never> | null;
+            /** Format: uuid */
+            partnerId: Record<string, never> | null;
+            /** @example 47000.00 */
+            packagePrice: string;
+            /** @example 3500.00 */
+            deliveryFee: string;
+            /** @example 0.00 */
+            partnerFee: string;
+            /** Format: date-time */
+            deliveredAt: Record<string, never> | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        WayDetailResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            riderId: string;
+            riderName: string;
+            /**
+             * Format: date
+             * @example 2026-10-16
+             */
+            wayDate: string;
+            /** @example 1 */
+            sequence: number;
+            /** @example 500.00 */
+            commissionRate: string;
+            isOpen: boolean;
+            /** @enum {string} */
+            state: "EMPTY" | "PENDING_APPROVAL" | "EARNED" | "PAID_ANYWAY";
+            orderCount: number;
+            /** @example 500.00 */
+            commissionAmount: string;
+            /** @example 0.00 */
+            pendingAmount: string;
+            isPaidWithoutDelivery: boolean;
+            payAnywayReason: Record<string, never> | null;
+            /** Format: uuid */
+            payAnywayBy: Record<string, never> | null;
+            /** Format: date-time */
+            payAnywayAt: Record<string, never> | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            orders: components["schemas"]["WayOrderResponseDto"][];
+        };
+        MoveWayOrdersDto: {
+            orderIds: string[];
+            /** Format: uuid */
+            targetWayId: string;
+        };
+        PayWayAnywayDto: {
+            /** @example Customer package was lost before delivery */
+            reason: string;
+        };
+        TownshipResponseDto: {
+            id: string;
+            name: string;
+            defaultDeliveryFee: string;
+            leadTimeDays: number;
+            defaultAssigneeType?: Record<string, never> | null;
+            defaultRiderId?: Record<string, never> | null;
+            defaultPartnerId?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateTownshipDto: {
+            name: string;
+            /** @example 3500.00 */
+            defaultDeliveryFee: string;
+            leadTimeDays: number;
+            /** @enum {string|null} */
+            defaultAssigneeType?: "RIDER" | "PARTNER" | null;
+            defaultRiderId?: Record<string, never> | null;
+            defaultPartnerId?: Record<string, never> | null;
+        };
+        UpdateTownshipDto: {
+            name?: string;
+            defaultDeliveryFee?: string;
+            leadTimeDays?: number;
+            /** @enum {string|null} */
+            defaultAssigneeType?: "RIDER" | "PARTNER" | null;
+            defaultRiderId?: Record<string, never> | null;
+            defaultPartnerId?: Record<string, never> | null;
+        };
+        DeliveryPartnerResponseDto: {
+            id: string;
+            name: string;
+            phone?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            isActive: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateDeliveryPartnerDto: {
+            name: string;
+            phone?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            /** @default true */
+            isActive: boolean;
+        };
+        UpdateDeliveryPartnerDto: {
+            name?: string;
+            phone?: Record<string, never> | null;
+            note?: Record<string, never> | null;
+            isActive?: boolean;
+        };
+        Object: Record<string, never>;
+        OrderReportRowDto: {
+            id: string;
+            trackingCode: string;
+            shopId: string;
+            shopName: string;
+            customerName: string;
+            customerPhone?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            townshipId?: Record<string, never> | null;
+            townshipName?: Record<string, never> | null;
+            /** @enum {string} */
+            status: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+            /** @enum {string|null} */
+            assigneeType?: "RIDER" | "PARTNER" | null;
+            assigneeId?: Record<string, never> | null;
+            assigneeName?: Record<string, never> | null;
+            packagePrice: string;
+            deliveryFee: string;
+            codToCollect: string;
+            netOwedToShop: string;
+            partnerFee: string;
+            createdAt: string;
+            deliveredAt?: Record<string, never> | null;
+        };
+        ReportPaginationDto: {
+            page: number;
+            perPage: number;
+            total: number;
+            totalPages: number;
+        };
+        OrderReportTotalsDto: {
+            orderCount: number;
+            packagePrice: string;
+            deliveryFee: string;
+            codToCollect: string;
+            netOwedToShop: string;
+            partnerFee: string;
+        };
+        OrderReportResponseDto: {
+            data: components["schemas"]["OrderReportRowDto"][];
+            meta: components["schemas"]["ReportPaginationDto"];
+            totals: components["schemas"]["OrderReportTotalsDto"];
+        };
+        ShopStatementResponseDto: {
+            shopName: string;
+            dateFrom: string;
+            dateTo: string;
+            dateBasis: string;
+            receivedCount: number;
+            outForDeliveryCount: number;
+            deliveredCount: number;
+            returnedCount: number;
+            cancelledCount: number;
+            priceTotal: string;
+            feeTotal: string;
+            codCollected: string;
+            codExpected: string;
+            netOwedToShopDelivered: string;
+            pendingNetOwedToShop: string;
+            netOwedToShopTotal: string;
+        };
+        RiderCollectionRowDto: {
+            riderId: string;
+            riderName: string;
+            date: string;
+            deliveredOrderCount: number;
+            awaitingApprovalOrderCount: number;
+            expectedCodToHandBack: string;
+            awaitingApprovalCod: string;
+        };
+        RiderCollectionTotalsDto: {
+            deliveredOrderCount: number;
+            awaitingApprovalOrderCount: number;
+            expectedCodToHandBack: string;
+            awaitingApprovalCod: string;
+        };
+        RiderCollectionResponseDto: {
+            data: components["schemas"]["RiderCollectionRowDto"][];
+            totals: components["schemas"]["RiderCollectionTotalsDto"];
+        };
+        RiderPayoutRowDto: {
+            riderId: string;
+            riderName: string;
+            date: string;
+            wayCount: number;
+            rateTotal: string;
+            earnedCount: number;
+            earnedAmount: string;
+            pendingApprovalCount: number;
+            pendingApprovalAmount: string;
+            paidAnywayCount: number;
+            paidAnywayAmount: string;
+            overrideWayCount: number;
+        };
+        RiderPayoutTotalsDto: {
+            wayCount: number;
+            rateTotal: string;
+            earnedCount: number;
+            earnedAmount: string;
+            pendingApprovalCount: number;
+            pendingApprovalAmount: string;
+            paidAnywayCount: number;
+            paidAnywayAmount: string;
+            overrideWayCount: number;
+        };
+        RiderPayoutResponseDto: {
+            data: components["schemas"]["RiderPayoutRowDto"][];
+            totals: components["schemas"]["RiderPayoutTotalsDto"];
+        };
+        DashboardKpiDto: {
+            key: string;
+            count: number;
+            amount: string;
+        };
+        OrdersPerDayStatusDto: {
+            date: string;
+            /** @enum {string} */
+            status: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+            orderCount: number;
+        };
+        FinancialDayDto: {
+            date: string;
+            feeIncome: string;
+            partnerCost: string;
+            commissionEarned: string;
+            margin: string;
+        };
+        TopShopDto: {
+            shopId: string;
+            shopName: string;
+            orderCount: number;
+        };
+        TownshipSuccessRateDto: {
+            townshipId: string;
+            townshipName: string;
+            deliveredCount: number;
+            returnedCount: number;
+            cancelledCount: number;
+            /** @description Percentage from 0 to 100, to two decimals */
+            successRate: string;
+        };
+        OfficeDashboardResponseDto: {
+            today: string;
+            kpis: components["schemas"]["DashboardKpiDto"][];
+            ordersPerDayByStatus: components["schemas"]["OrdersPerDayStatusDto"][];
+            feeIncomeVsPartnerCostVsCommission: components["schemas"]["FinancialDayDto"][];
+            topShops: components["schemas"]["TopShopDto"][];
+            townshipSuccessRates: components["schemas"]["TownshipSuccessRateDto"][];
+            averagePendingAgeDays: string;
+        };
+        OrdersPerWayDto: {
+            wayId: string;
+            date: string;
+            orderCount: number;
+        };
+        RiderDashboardResponseDto: {
+            today: string;
+            todayWayCount: number;
+            weekWayCount: number;
+            monthWayCount: number;
+            commissionEarned: string;
+            commissionPending: string;
+            ordersPerWay: components["schemas"]["OrdersPerWayDto"][];
+            codToHandBack: string;
+        };
+        ShopOrderListItemDto: {
+            id: string;
+            trackingCode: string;
+            customerName: string;
+            customerPhone?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            townshipName?: Record<string, never> | null;
+            packagePrice: string;
+            deliveryFee: string;
+            total: string;
+            codToCollect: string;
+            netOwedToShop: string;
+            isPackagePaidToShop: boolean;
+            isFeePaidToShop: boolean;
+            /** @enum {string} */
+            displayStatus: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+            needsAttention: boolean;
+            createdAt: string;
+            deliveredAt?: Record<string, never> | null;
+            /** Format: date */
+            estimatedDeliveryDate?: string | null;
+        };
+        ShopOrderListMetaDto: {
+            page: number;
+            perPage: number;
+            total: number;
+            totalPages: number;
+        };
+        ShopOrderListTotalsDto: {
+            orderCount: number;
+            packagePrice: string;
+            deliveryFee: string;
+            total: string;
+            codToCollect: string;
+            netOwedToShop: string;
+        };
+        ShopOrderListResponseDto: {
+            data: components["schemas"]["ShopOrderListItemDto"][];
+            meta: components["schemas"]["ShopOrderListMetaDto"];
+            totals: components["schemas"]["ShopOrderListTotalsDto"];
+        };
+        ShopOrderHistoryEventDto: {
+            createdAt: string;
+            /** @enum {string} */
+            displayStatus: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+            reason?: Record<string, never> | null;
+        };
+        ShopOrderDetailResponseDto: {
+            id: string;
+            trackingCode: string;
+            customerName: string;
+            customerPhone?: Record<string, never> | null;
+            deliveryAddress?: Record<string, never> | null;
+            townshipName?: Record<string, never> | null;
+            packagePrice: string;
+            deliveryFee: string;
+            total: string;
+            codToCollect: string;
+            netOwedToShop: string;
+            isPackagePaidToShop: boolean;
+            isFeePaidToShop: boolean;
+            /** @enum {string} */
+            displayStatus: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+            needsAttention: boolean;
+            createdAt: string;
+            deliveredAt?: Record<string, never> | null;
+            /** Format: date */
+            estimatedDeliveryDate?: string | null;
+            history: components["schemas"]["ShopOrderHistoryEventDto"][];
+        };
+        ShopDashboardCountsDto: {
+            received: number;
+            outForDelivery: number;
+            delivered: number;
+            cancelled: number;
+            needsAttention: number;
+        };
+        ShopDashboardMoneyDto: {
+            codCollected: string;
+            netSettlementDelivered: string;
+            codExpected: string;
+            netOwedOpen: string;
+        };
+        ShopOrdersPerDayDto: {
+            date: string;
+            /** @enum {string} */
+            displayStatus: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+            orderCount: number;
+        };
+        ShopDashboardResponseDto: {
+            dateFrom: string;
+            dateTo: string;
+            dateBasis: string;
+            counts: components["schemas"]["ShopDashboardCountsDto"];
+            money: components["schemas"]["ShopDashboardMoneyDto"];
+            ordersPerDayByStatus: components["schemas"]["ShopOrdersPerDayDto"][];
         };
     };
     responses: never;
@@ -728,6 +2293,1509 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UpdateRoleResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by shop name, phone or address */
+                search?: string;
+                /** @description Filter by whether the shop has a login */
+                hasLogin?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopListResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateShopDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    ShopsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ShopsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateShopDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by customer name, phone or address */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerListResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCustomerDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    CustomersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CustomersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCustomerDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_listMyOrders_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderOrderResponseDto"][];
+                };
+            };
+        };
+    };
+    RidersController_submitDelivered_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderDeliveredResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by rider name, email or phone */
+                search?: string;
+                status?: components["schemas"]["UserStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderListResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRiderDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    RidersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RidersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRiderDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_list_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                perPage?: number;
+                /** @description Search by tracking code, customer name, phone, or delivery address */
+                search?: string;
+                status?: components["schemas"]["OrderStatus"];
+                /** @description Filter by shop id */
+                shopId?: string;
+                /** @description Filter by township id */
+                townshipId?: string;
+                /** @description Filter by rider or partner id */
+                assigneeId?: string;
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                /** @description Filter by customer id */
+                customerId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderListResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrderDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_getAudit_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderFieldAuditResponseDto"][];
+                };
+            };
+        };
+    };
+    OrdersController_history_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderHistoryResponseDto"][];
+                };
+            };
+        };
+    };
+    OrdersController_assign_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignOrderDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_postpone_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderReasonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_cancel_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderReasonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_returnOrder_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderReasonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_approve_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_sendBack_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendBackOrderDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_markPartnerDelivered_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderDetailResponseDto"];
+                };
+            };
+        };
+    };
+    OrdersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrderDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_list_v1: {
+        parameters: {
+            query?: {
+                riderId?: string;
+                dateFrom?: string;
+                dateTo?: string;
+                state?: "EMPTY" | "PENDING_APPROVAL" | "EARNED" | "PAID_ANYWAY";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayResponseDto"][];
+                };
+            };
+        };
+    };
+    WaysController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWayDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_getCommissionRate_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommissionRateResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_updateCommissionRate_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCommissionRateDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommissionRateResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayDetailResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_close_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_moveOrders_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveWayOrdersDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayDetailResponseDto"];
+                };
+            };
+        };
+    };
+    WaysController_payAnyway_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayWayAnywayDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WayResponseDto"];
+                };
+            };
+        };
+    };
+    TownshipsController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"][];
+                };
+            };
+        };
+    };
+    TownshipsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTownshipDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"];
+                };
+            };
+        };
+    };
+    TownshipsController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"];
+                };
+            };
+        };
+    };
+    TownshipsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TownshipsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTownshipDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TownshipResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveryPartnersController_list_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryPartnerResponseDto"][];
+                };
+            };
+        };
+    };
+    DeliveryPartnersController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDeliveryPartnerDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryPartnerResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveryPartnersController_get_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryPartnerResponseDto"];
+                };
+            };
+        };
+    };
+    DeliveryPartnersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeliveryPartnersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDeliveryPartnerDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeliveryPartnerResponseDto"];
+                };
+            };
+        };
+    };
+    ReportsController_getOrders_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                shopId?: string;
+                townshipId?: string;
+                status?: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+                /** @description Rider or delivery partner id */
+                assigneeId?: string;
+                /** @description Search by tracking code, customer name, or phone */
+                search?: string;
+                page?: components["schemas"]["Object"];
+                perPage?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderReportResponseDto"];
+                };
+            };
+        };
+    };
+    ReportsController_exportOrders_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                format: "csv" | "xlsx";
+                shopId?: string;
+                townshipId?: string;
+                status?: "PENDING" | "ASSIGNED" | "AWAITING_APPROVAL" | "DELIVERED" | "RETURNED" | "CANCELLED";
+                assigneeId?: string;
+                /** @description Search by tracking code, customer name, or phone */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ReportsController_getShopStatement_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                shopId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopStatementResponseDto"];
+                };
+            };
+        };
+    };
+    ReportsController_exportShopStatement_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                format: "csv" | "xlsx";
+                shopId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ReportsController_getRiderCollection_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                riderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderCollectionResponseDto"];
+                };
+            };
+        };
+    };
+    ReportsController_exportRiderCollection_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                format: "csv" | "xlsx";
+                riderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ReportsController_getRiderPayout_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                riderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderPayoutResponseDto"];
+                };
+            };
+        };
+    };
+    ReportsController_exportRiderPayout_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                format: "csv" | "xlsx";
+                riderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ReportsController_getOfficeDashboard_v1: {
+        parameters: {
+            query: {
+                dateFrom: string;
+                dateTo: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfficeDashboardResponseDto"];
+                };
+            };
+        };
+    };
+    RiderDashboardController_getDashboard_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiderDashboardResponseDto"];
+                };
+            };
+        };
+    };
+    ShopPortalController_getOrders_v1: {
+        parameters: {
+            query?: {
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                timeFrom?: string;
+                timeTo?: string;
+                displayStatus?: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+                needsAttention?: boolean;
+                /** @description Search customer name, phone, or tracking code */
+                search?: string;
+                page?: components["schemas"]["Object"];
+                perPage?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopOrderListResponseDto"];
+                };
+            };
+        };
+    };
+    ShopPortalController_exportOrders_v1: {
+        parameters: {
+            query?: {
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                timeFrom?: string;
+                timeTo?: string;
+                displayStatus?: "RECEIVED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED";
+                needsAttention?: boolean;
+                /** @description Search customer name, phone, or tracking code */
+                search?: string;
+                format?: "csv" | "xlsx";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop-safe report file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ShopPortalController_getOrder_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopOrderDetailResponseDto"];
+                };
+            };
+        };
+    };
+    ShopPortalController_getDashboard_v1: {
+        parameters: {
+            query?: {
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopDashboardResponseDto"];
+                };
+            };
+        };
+    };
+    ShopPortalController_getStatement_v1: {
+        parameters: {
+            query?: {
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopStatementResponseDto"];
+                };
+            };
+        };
+    };
+    ShopPortalController_exportStatement_v1: {
+        parameters: {
+            query?: {
+                dateFrom?: string;
+                dateTo?: string;
+                dateBasis?: "ENTRY" | "DELIVERED";
+                format?: "csv" | "xlsx";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop-safe statement file attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv; charset=utf-8": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
         };

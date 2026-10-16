@@ -1,7 +1,8 @@
+import type { UserResponseDto } from '@/types/user'
 import type { components } from '@/types/api'
 
 type Role = components['schemas']['RoleResponseDto']
-type User = components['schemas']['UserResponseDto']
+type User = UserResponseDto
 
 /**
  * Roles a caller may assign / grant to. Mirrors backend hierarchy rules:

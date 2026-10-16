@@ -7,6 +7,7 @@ const userBaseFields = {
   // Runtime: "" | "09123456789" | null (codegen stubs phone as Record<string,never>|null).
   phone: z.string().nullable(),
   roleId: z.string().min(1, 'Select a role'),
+  shopId: z.string().optional(),
 }
 
 export const createUserSchema = z.object({

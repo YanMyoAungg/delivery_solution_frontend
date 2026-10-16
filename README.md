@@ -1,32 +1,28 @@
-# React + TypeScript + Vite
+# Delivery Solution Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Vite + React + TypeScript frontend for the delivery operations API. The API must be running at `http://localhost:3000` for application data and type generation; Vite proxies `/api` to it.
 
-Currently, two official plugins are available:
+## Setup and run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Start the API and database using [`../delivery_solution_api/README.md`](../delivery_solution_api/README.md).
+2. From this directory, install dependencies and generate types while the API is running:
 
-## React Compiler
+   ```bash
+   pnpm install
+   pnpm codegen
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3. Start the frontend:
 
-## Expanding the Oxlint configuration
+   ```bash
+   pnpm dev
+   ```
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+The API README lists demo login emails for seeded riders (`rider1@demo.delivery.local`, `rider2@demo.delivery.local`) and shops (`shop1@demo.delivery.local`, `shop2@demo.delivery.local`, `shop3@demo.delivery.local`). It does not document a demo password.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Checks
+
+```bash
+pnpm build
+pnpm lint
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

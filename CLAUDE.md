@@ -1,116 +1,143 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for work in this repository.
 
 ## Project
 
-Vite + React (SPA) + TypeScript frontend for a single delivery company's operations backend (`d_api`, NestJS). The first vertical slice is built: login, user management CRUD, roles CRUD, the role-permission grant grid, change-password. Sibling repos live in `../` (parent `delivery_solution/`): `d_api` (backend), `drizzle`. Nothing committed yet — only commit/push when the user explicitly asks.
+Vite + React + TypeScript SPA for a delivery company's operations API (`../delivery_solution_api`, NestJS). The frontend currently includes authentication; user, role, and permission-grid administration; shop/customer/rider master data; townships and delivery partners; orders with an approval workflow; ways and commission; office, shop, and rider reports/dashboards; a rider board; and a separate shop portal.
 
-**Locked decisions (user):**
-- **Vite + React SPA + TypeScript** — not Next.js (internal ops tool, pure JSON API, no SSR).
-- **Tailwind CSS + shadcn/ui** (copy-paste Radix-based components, light mode only in this pass).
-- **Design system:** black & white (monochrome) — near-black `--primary` / light-gray `--accent`, neutral whites/grays, gray focus ring. Fira Sans body / Fira Code numerals. Status colors (green/amber/red via `--success`/`--warning`/`--destructive`) are functional indicators for ACTIVE/INACTIVE + badges, not chrome. Dense, scannable ops-dashboard style (not landing-page style). **Colors come from CSS tokens in `src/index.css` ONLY — never hardcode hex or named color classes (`bg-blue-*`, `text-red-*`) in components.**
-- Deps to add (`src/`): `react-router-dom`, `@tanstack/react-query`, `zustand`, `axios`, `lucide-react`. Panel manager: `pnpm`, consistent with `d_api`.
+**Stack and UI conventions:** React Router, TanStack Query, Zustand, Axios, Tailwind CSS, and Base UI/shadcn components. Light mode, monochrome token-based styling, Fira Sans body / Fira Code numerals, and dense, scannable operations screens. Colors come from CSS tokens in `src/index.css`; do not hardcode colors in components.
 
 ## Commands
 
 ```bash
-cd ../d_api && pnpm start:dev   # backend on :3000 (DB: docker compose up -d, seed: owner@mail.com + admin1/admin2@mail.com / Password1234)
-pnpm dev                        # Vite dev server on :5173, proxies /api to backend
-pnpm build                      # tsc + vite build
-pnpm lint                       # ESLint
-pnpm test                       # Vitest unit (**/*.spec.ts)
-pnpm test -- <path>             # single test file / filter
+pnpm dev       # Vite on :5173; proxies /api to the API on :3000
+pnpm codegen   # refresh src/types/api.ts; the API must be running
+pnpm build     # tsc -b && vite build
+pnpm lint      # ESLint
 ```
 
-**Do not write new tests in this repo** (standing user instruction). The pre-existing Vitest suite stays and must keep passing, but new work is gated by `pnpm lint` + `pnpm build` + manual smoke against `d_api`, never by a new spec file.
+The API must be running for application data and code generation. See `README.md` and `../delivery_solution_api/README.md` for setup and demo login emails. Do not add frontend test files; this documentation task does not change source or tests.
 
-## API contract (from `d_api`, all `/api/v1`, Bearer JWT)
+## API contract and generated types
 
-Source of truth: **`GET /api/v1/docs-json`** — regenerate types with `pnpm codegen` (`openapi-typescript`, needs `d_api` running), never hand-wire shapes. Key shapes to be aware of:
-- `POST /auth/login` → `{ accessToken, user: UserResponseDto (id,name,email,phone,roleId,role,status,createdAt,updatedAt), permissions: string[] }`
-- `GET /auth/me` → `{ user, permissions }` (call on boot to restore/validate session); `POST /auth/change-password` → 204 (backend invalidates old tokens → frontend must force logout).
-- Users: `GET /users` (`search`,`roleId`,`status`,`page`,`perPage` → `{ data, meta }`), `POST /users`, `GET/PATCH/DELETE /users/:id` — gated `users.create/read/update/delete`.
-- Roles: `GET /roles` / `GET|PATCH|DELETE /roles/:id` / `POST /roles` — `{ id, name, description, isSystem, userCount }`, gated `roles.*` (`roles` has 4 actions: no `export`/`import`).
-- Permissions: `GET /permissions` (catalog grouped by `module`) gated `permissions.read`; `GET/PUT /permissions/roles/:roleId` (`PUT` body `{ permissions: string[] }`, replace-set) gated **`permissions.update`**. **The catalog is fixed and read-only from the frontend: `POST /permissions` and `DELETE /permissions/:name` are gone (404).**
+The API base is `/api/v1`; the running API's `GET /api/v1/docs-json` is canonical. Run `pnpm codegen` after API contract changes. `openapi-typescript` writes `src/types/api.ts`: method entries refer to generated `operations["OperationName"]` definitions; do not treat the path-item stub as the request/response type or hand-edit the generated file. Keep frontend-specific types in separate hand-written type files.
 
-RBAC is **dynamic** (spatie-style: `roles`/`permissions`/`role_permissions` + `users.role_id`, OWNER/ADMIN manage everything from the UI). UI must mirror backend rules:
-- **The grid is fixed**: 6 actions (`create, read, update, delete, export, import`) × 13 modules = 68 keys. `view ≡ read`, `edit ≡ update`; the key is `{module}.{action}`, lowercase. `src/types/permission.ts` mirrors it as a typed union so a backend rename is a build error, not a silent 403.
-- `is_system` roles (OWNER): hold every permission, rows read-only/locked, zero grant rows — so read the grid from `isSystem`, **never** from `GET /permissions/roles/:roleId` (that returns empty for OWNER).
-- ADMIN: manages OFFICER/created roles only; OWNER + ADMIN rows read-only; can grant only keys ADMIN itself holds; own role read-only.
-- role `name` immutable after create (`PATCH /roles/:id` takes `{ description? }` only); delete-role blocked when `userCount > 0` (409 surfaces backend message).
-- Offer only catalog keys in the grid (`PUT` of unknown keys 404s). A module × action the catalog doesn't define renders as an inert `·` cell. `PUT` replaces the whole set, so keys no longer in the catalog are pruned on save.
+Implemented endpoint groups used by the frontend:
 
-## Architecture (planned layout)
+- Authentication: `/auth/login`, `/auth/me`, `/auth/change-password`.
+- Administration and master data: `/users`, `/roles`, `/permissions`, `/shops`, `/customers`, and `/riders`.
+- Office order workflow: `/orders` and `/orders/:id` for list/create/detail/edit, history/audit, assignment, postponement, cancellation, return, delivery approval/send-back, and partner delivery marking.
+- Reference data: `/townships` and `/delivery-partners` (permission module `partners`).
+- Ways and commission: `/ways`, way actions/details, and `/ways/settings/commission-per-way`.
+- Rider: `/riders/me/orders`, `/riders/me/orders/:id/delivered`, and `/riders/me/dashboard`.
+- Reports: `/reports/orders`, shop statement, rider collection, rider payout, their exports, and `/reports/office-dashboard`.
+- Shop portal: `/shop/orders`, order detail/export, `/shop/dashboard`, and `/shop/statement` with export.
 
-- `src/lib/api/` — thin `http` wrapper (axios): attaches `Authorization: Bearer <token>`; on 401 clears session + redirects `/login` (skip loop on `/auth/login` and boot-time `/auth/me`). Request/response types come from `src/types/api.ts`, generated by `openapi-typescript` (see Types & Codegen).
-- `src/lib/store/` (zustand) — auth store: `token`, `user`, `permissions`, `setSession`, `clearSession`, `hasPermission(key: PermissionKey)`; token persisted in `localStorage`. `permissions` stays `string[]` (server data); `PermissionKey` is assignable to it.
-- `usePermission` hook + `<ProtectedRoute perm="users.read">`: route-level gate → 403 page; button/link-level gate hides element. Both take a `PermissionKey`, so a stale key fails to compile. Mirrors backend grants so UI hides what the API would 403.
-- `src/components/layout/AppShell` — sidebar (desktop ≥1024px, mobile collapsible drawer), topbar with role badge + dropdown (Change Password / Logout), `<Outlet/>`.
-- `src/features/auth|users|roles|permissions|settings/` — one folder per domain, each owning its **`api.ts`** (query-key factory + fetch fns + `use*` hooks), **`validations.ts`** (zod schemas + inferred `*Values` types — `permissions/` no longer has one: the grant grid has no form to validate), and its pages/dialogs/forms. Cross-feature access is a **direct feature→feature import** (`features/users/api.ts` imports `rolesKeys` from `@/features/roles/api`) — no `lib/` indirection layer. Example: `features/settings/ChangePasswordPage.tsx` imports from `@/features/auth/api` + `@/features/auth/validations`.
-- `src/config/` — app-level static config (e.g. `src/config/navigation.ts` — sidebar `NAV_ITEMS` + `firstAllowedPath`). NOT in `lib/`.
-- `src/types/` — `api.ts` (codegen, read-only) + `permission.ts` (hand-written mirror of the backend's `permission-keys.ts`: `MODULE_ACTIONS`, `PermissionKey`, `ACTION_ORDER`). The catalog is fixed, so keys autocomplete at compile time; which cells *exist* still comes from the API response.
-- `src/components/ui/` — shadcn components: `button`, `input`, `label`, `card`, `dialog`, `table`, `dropdown-menu`, `badge`, `select`, `alert-dialog`, `sonner`, `skeleton`, `pagination`.
+## Permissions
 
-## Naming conventions (mandatory)
+`src/types/permission.ts` is the typed frontend mirror of the fixed permission catalog. It defines **17 modules / 87 keys**:
 
-- **No abbreviations.** Full words: `permission`/`permissions`, not `p`/`perm`; `role` not `r`; `user` not `u`. Single letters only for loop indexes. No crypto-short file names either — `navigation.ts` not `nav.ts`, `nullable.ts` not `narrow.ts`.
-- **Files** — kebab-case components in `components/`, PascalCase page files in `features/`: `UsersPage.tsx`, `LoginPage.tsx`, `RoleDialog.tsx`, `usePermission.ts`. Helper/util files: `auth.store.ts`, `http.ts`. Types: `api.ts` (codegen), `permission.ts`.
-- **Components** — PascalCase, `<XxxPage>` / `<XxxDialog>` / `<XxxForm>`: `UsersPage`, `AppShell`, `EmptyState`.
-- **Functions & hooks** — camelCase, verb-first; `use` prefix for hooks: `usePermission`, `filterAssignableRoles`, `hasPermission`, `setSession`, `clearSession`.
-- **Variables** — camelCase, descriptive: `permissions` (array), `role`, `currentUser`, `dirtyState`.
-- **Constants** — UPPER_SNAKE_CASE: `VITE_API_URL`, query keys.
-- **Booleans** — `is`/`has`/`can` prefix: `isSystem`, `hasPermission`, `isDirty`.
-- **Types & interfaces** — PascalCase, `Props` suffix on component props, DTO-suffixed on API shapes: `UserResponseDto`, `LoginPageProps`. Generated types (codegen) are read-only inputs, never hand-edited.
+| Module | Keys |
+|---|---:|
+| `users` | 6 |
+| `roles` | 4 |
+| `permissions` | 2 |
+| `shops` | 6 |
+| `customers` | 6 |
+| `riders` | 6 |
+| `orders` | 9 |
+| `deliveries` | 7 |
+| `townships` | 6 |
+| `partners` | 6 |
+| `ways` | 7 |
+| `shop-portal` | 1 |
+| `shop-reports` | 1 |
+| `returns` | 6 |
+| `payments` | 6 |
+| `notifications` | 6 |
+| `reports` | 2 |
 
-## Skills — invoke before writing frontend code
+The key union is `{module}.{action}`. The catalog is fixed; runtime grants come from the API. Use the shared `usePermission`, `<Can>`, and `<ProtectedRoute>` helpers instead of duplicating permission checks. A missing catalog cell is not a grant.
 
-Check the table at the start of every task touching UI; if a row matches, invoke the skill before writing code. Multiple can apply.
+## Architecture
 
-| Task touches | Invoke |
-|---|---|
-| App screens, CRUD, forms, dashboards, components, responsive layouts | `ui-ux-pro-max` (or `ui-ux-pro-max:ui-styling` for styling-only) |
-| Landing/marketing pages, visual polish, aesthetic direction | `taste` (on top of `ui-ux-pro-max`) |
-| Any chart, graph, KPI tile, data visualization | `dataviz` (before first chart line) |
-| Logos, banners, decks, icon sets, brand assets | `ui-ux-pro-max:design` |
-| Library/framework/SDK docs question | `ctx7` CLI (see `~/.claude/rules/context7.md`) |
-| Code review / quality pass on changes | `code-review` |
+- `src/App.tsx` — query client, auth bootstrap, route trees, and route gates.
+- `src/config/navigation.ts` — office navigation and permission-aware first destination.
+- `src/components/layout/` and `src/components/ui/` — app shells and shared UI primitives.
+- `src/features/` — `auth`, `customers`, `errors`, `master-data`, `operations`, `orders`, `partners`, `permissions`, `reports`, `roles`, `riders`, `settings`, `shop-portal`, `shops`, `townships`, `users`, and `ways`. Each feature owns its API/query logic and relevant pages/forms/components.
+- `src/lib/` — API client, auth gates, stores, and shared utilities (including money helpers).
+- `src/types/` — generated `api.ts` and hand-written permission/user types.
 
-Layering: `ui-ux-pro-max` (usability/structure) → `taste` (visual polish) — `taste` never overrides usability/accessibility. Pure-logic/API work needs no skill; when unsure, invoke anyway.
+The old `deliveries` and `pickups` feature folders are not active route/features; the current workflow is under orders and riders.
 
-## Conventions
+## Routes, access, and landing pages
 
-- One primary CTA per screen; touch targets ≥40px; loading skeletons on data fetch; visible field labels, inline errors below fields, show/hide password toggle.
-- React Query keyed on filter state (search/role/status/page) with refetch-on-mutation; pagination control wired to `meta`.
-- Create-dialog role Select must be restricted per the same hierarchy rule that restricts ADMIN (hide OWNER/ADMIN for ADMIN callers).
-- Keep contrast ≥4.5:1; focus rings visible; 375px viewport must not scroll horizontally. Defer dark mode.
-- Correctness bar: `pnpm lint` zero errors and `pnpm build` (tsc) green before calling work done, plus a manual smoke pass against `d_api`. No new spec files — see Tests above.
+All protected operational routes are under the auth bootstrap and authenticated-route gates; `/login` is public. The shop and office trees are separated:
 
-### Types & Codegen (do right after scaffold)
+```text
+Public: /login
+Root:   / -> /shop for role SHOP; otherwise first permitted office navigation item
 
-- DevDep `openapi-typescript`; script `"codegen": "openapi-typescript http://localhost:3000/api/v1/docs-json -o src/types/api.ts"` (`d_api` must be running). Commit the generated `src/types/api.ts` — it is the **source of truth** for all request/response types.
-- Keep hand-written types in a separate file (not in `api.ts`) so codegen never clobbers them.
+ShopPortalGate (requires role name SHOP AND shop-portal.read)
+└── ShopLayout
+    ├── /shop
+    ├── /shop/orders
+    ├── /shop/orders/:orderId
+    └── /shop/statement
 
-### shadcn / Base UI (base-nova) — gotchas
+OfficeUserGate (rejects role name SHOP)
+└── AppShell
+    ├── /dashboard                         reports.read
+    ├── /reports/orders                    reports.read
+    ├── /reports/shop-statement            reports.read
+    ├── /reports/rider-collection          reports.read
+    ├── /reports/rider-payout              reports.read
+    ├── /rider-dashboard                   deliveries.read
+    ├── /users                             users.read
+    ├── /roles                             roles.read
+    ├── /permissions                       permissions.read
+    ├── /shops                             shops.read
+    ├── /customers                         customers.read
+    ├── /riders                            riders.read
+    ├── /orders                            orders.read
+    ├── /orders/approval                   orders.read
+    ├── /orders/:orderId                   orders.read
+    ├── /townships                         townships.read
+    ├── /partners                          partners.read
+    ├── /rider-board                       deliveries.read
+    ├── /ways, /ways/:wayId                ways.read
+    ├── /ways/settings                     ways.read
+    └── /settings/password                 office shell; no permission gate
 
-- Menu/Dropdown items fire **`onClick`**, NOT Radix's `onSelect`. Use native event handlers.
-- Menu items and `DropdownMenuLabel` must nest inside a `<DropdownMenuGroup>` — Base UI throws `MenuGroupContext is missing` (white screen) otherwise.
-- Do NOT compose triggers via `render={<Button/>}` when the inner component itself uses `useRender` (base-nova Button) — it double-owns the DOM node and breaks the menu context. Prefer a plain `<DropdownMenuTrigger className="...">` styled with tokens.
-- `<Label>` has no `required` visual — mark requiredness with text; Zod enforces.
+Other: /403, /* (not found)
+```
 
-### Type safety / code quality (mandatory)
+`firstAllowedPath` scans `NAV_ITEMS` in order and falls back to `/settings/password`. OWNER/ADMIN/OFFICER land on `/dashboard` when `reports.read` is present; RIDER lands on `/rider-dashboard` when that is its first permitted navigation item; SHOP is sent to `/shop` by role name and must still pass both shop gate checks. These destinations follow actual grants and navigation order, not a separate role-to-route table.
 
-- **No `any`** anywhere. Type everything: components props with explicit interfaces, event/param types, axios error handling via `unknown` + narrowing (one shared `ApiError` helper reading `error.response?.data`). `@typescript-eslint/no-explicit-any` stays on.
-- No `@ts-ignore` / `@ts-expect-error` / bare `!`. Codegen output may carry `Record<string, never>`/loose union stubs — narrow with a typed helper or explicit DTO interface instead of casting to `any`.
-- Use `unknown` at trust boundaries, then narrow with type guards. Prefer `satisfies` for const config arrays bounded by a broader type.
-- Route/button gates read the zustand `permissions[]` via one shared `usePermission`/`<Can>` — never duplicate the permission-matrix in components.
-- **No `setState` inside `useEffect` keyed on a fresh-reference value** (`new Set()`, `new Array()`, `[]` via `?? default` when a React Query is disabled/error/`undefined`). This causes an infinite render loop ("Maximum update depth exceeded" → page freezes). Instead: derive the display value from the query response directly, or use the derive-or-own draft pattern (`useState<{roleId: string; set: Set<string>} | null>(null)`) — no effect, no loop.
-- `react-hooks/exhaustive-deps` is **error**, not warn. Never `eslint-disable` it — that's how the freeze shipped. If a dep is genuinely unsafe, isolate the value with `useRef` or restructure; do not suppress the rule.
+## Money and workflow rules
 
+- Treat API money values as decimal strings. Keep money calculations in decimal-string/integer-minor-unit (`bigint`) helpers; never use JavaScript floating-point arithmetic for money. Do not coerce money to `number` for totals or comparisons.
+- COD and net owed derive from package price, delivery fee, and the two paid-to-shop flags; partner fee is an internal cost. They are projections, not a cash ledger. Delivery receipt counts only after approval.
+- Preserve the approval workflow: rider submission becomes awaiting approval; office approval delivers it, and send-back returns it to assigned with a reason. Partner delivery is marked by office. Shops must not be shown rider/partner identity or internal-only information.
+- Keep all edits and actions aligned with API permissions and generated contract types.
 
-### React Query (mandatory)
+## UI, charts, and skills
 
-- **Cross-key invalidation**: a mutation must invalidate ALL query keys whose data it affects, not just its home domain. Example: user create/update/delete invalidate `usersKeys.all` **and** `rolesKeys.all` — `role.userCount` is derived from membership, so only invalidating users leaves RolesPage stale for 60s.
-- **QueryClient defaults** (`src/App.tsx`): `retry` only on 5xx or network error (`status == null || status >= 500`) — never retry a 403/404 (it will fail 3× more); default `staleTime: 10_000`.
-- **Per-query `staleTime` overrides** are still fine for stale-but-correct static catalogs (roles, permission catalog = 60s). Mutation invalidation bypasses `staleTime`, so edits still refetch instantly.
-- Grant grid: keep `staleTime` on `useRoleGrants`, and always reset the derive-or-own `draft` on role switch and after save. A system (OWNER) role's checked set comes from `layoutDefinedKeys(buildGridLayout(catalog))`, never from the grants query.
+Invoke `ui-ux-pro-max` for UI work and `dataviz` before chart work when those skills are available. Some tools may not expose either skill; in that case follow these rules in this file:
+
+- Keep chart purpose and comparison explicit; label axes, units, date ranges, and series. Use consistent scales and avoid decorative 3D or misleading truncation.
+- Use the design tokens and accessible contrast; provide readable legends/tooltips and a non-color-only distinction. Ensure the underlying values remain available as text or a table.
+- Format currency from decimal strings; chart geometry may use a bounded ratio, but never use floating-point values to calculate or aggregate money.
+
+Other UI conventions: visible labels and inline validation, accessible focus states and touch targets, loading states for fetched data, and no horizontal overflow at 375px. Prefer one primary action per screen.
+
+## Vite watcher
+
+`vite.config.ts` currently excludes `**/.playwright-mcp/**` from watching. It does **not** currently configure a `downloads` exclusion; do not describe that exclusion as implemented until the Vite config changes.
+
+## Code quality
+
+- No `any`, `@ts-ignore`, `@ts-expect-error`, or unexplained non-null assertions. Narrow `unknown` at trust boundaries.
+- Keep feature boundaries clear and query keys tied to the filters that affect results. Mutations must invalidate every affected query family.
+- Keep ESLint and TypeScript/build checks green. Do not create new frontend test files.

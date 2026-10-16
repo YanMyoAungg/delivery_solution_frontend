@@ -16,9 +16,10 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { EmptyState } from '@/components/EmptyState'
+import type { UserResponseDto } from '@/types/user'
 import type { components } from '@/types/api'
 
-type User = components['schemas']['UserResponseDto']
+type User = UserResponseDto
 type UserStatus = components['schemas']['UserStatus']
 
 export function UsersPage() {

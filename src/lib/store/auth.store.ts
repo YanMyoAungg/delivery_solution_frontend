@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { components } from '@/types/api'
 import type { PermissionKey } from '@/types/permission'
+import type { UserResponseDto } from '@/types/user'
 
-type User = components['schemas']['UserResponseDto']
+type User = UserResponseDto
 
 interface AuthState {
   token: string | null

@@ -1,23 +1,164 @@
-import { useMemo, useState } from 'react'
-import { Plus, Search } from 'lucide-react'
-import { toast } from 'sonner'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { usePermission } from '@/lib/auth/gate'
-import { getApiErrorMessage } from '@/lib/api/client'
-import { PAGE_SIZE } from '@/lib/constants'
-import { createOrder, fetchOrder, fetchOrders, operationKeys, useContacts, type Order, type OrderBody, type OrderStatus } from '@/features/operations/api'
+import { Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/EmptyState'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { usePermission } from '@/lib/auth/gate'
+import { fetchRiders, useContacts } from '@/features/operations/api'
+import {
+  createOrder,
+  fetchDeliveryPartners,
+  fetchOrders,
+  fetchTownships,
+  orderKeys,
+  ORDER_STATUSES,
+  type OrderBody,
+  type OrderDateBasis,
+  type OrderFilters,
+  type OrderStatus,
+} from '@/features/orders/api'
+import { calculateCodToCollect, calculateNetOwedToShop } from '@/features/orders/money'
+import { OrderFormDialog } from '@/features/orders/OrderFormDialog'
+import { OrderSelectField } from '@/features/orders/components/OrderSelectField'
+import { wayKeys } from '@/features/ways/api'
 
-const ORDER_STATUSES: OrderStatus[] = ['PENDING', 'PICKED_UP', 'RECEIVED_AT_OFFICE', 'ASSIGNED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED', 'RETURNED']
-export function OrdersPage() { const canCreate = usePermission('orders.create'); const [page, setPage] = useState(1); const [search, setSearch] = useState(''); const [status, setStatus] = useState<'ALL' | OrderStatus>('ALL'); const [shopFilter, setShopFilter] = useState('ALL'); const [customerFilter, setCustomerFilter] = useState('ALL'); const [filters, setFilters] = useState({ search: '', status: 'ALL' as 'ALL' | OrderStatus, shopId: 'ALL', customerId: 'ALL' }); const [selected, setSelected] = useState<Order | null>(null); const [creating, setCreating] = useState(false); const shopsForFilter = useContacts('shops', { page: 1, perPage: 100 }); const customersForFilter = useContacts('customers', { page: 1, perPage: 100 }); const params = useMemo(() => ({ page, perPage: PAGE_SIZE, search: filters.search || undefined, status: filters.status === 'ALL' ? undefined : filters.status, shopId: filters.shopId === 'ALL' ? undefined : filters.shopId, customerId: filters.customerId === 'ALL' ? undefined : filters.customerId }), [page, filters]); const { data, isLoading, isError, error } = useQuery({ queryKey: operationKeys.orders(params), queryFn: () => fetchOrders(params) }); const queryClient = useQueryClient(); const createMutation = useMutation({ mutationFn: createOrder, onSuccess: () => queryClient.invalidateQueries({ queryKey: operationKeys.all }) }); return <div className="flex flex-col gap-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-semibold tracking-tight">Orders</h1><p className="text-sm text-muted-foreground">Register orders and inspect immutable lifecycle history.</p></div>{canCreate && <Button onClick={() => setCreating(true)}><Plus className="size-4" />New order</Button>}</div><div className="flex flex-wrap gap-2"><div className="relative max-w-sm flex-1"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={search} placeholder="Search tracking code..." aria-label="Search orders" onChange={(event) => setSearch(event.target.value)} /></div><Select value={status} onValueChange={(value) => { if (value === 'ALL' || ORDER_STATUSES.includes(value as OrderStatus)) setStatus(value as 'ALL' | OrderStatus) }} items={Object.fromEntries([['ALL', 'All statuses'], ...ORDER_STATUSES.map((value) => [value, value.replaceAll('_', ' ')])])}><SelectTrigger className="w-52" aria-label="Filter orders by status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ALL">All statuses</SelectItem>{ORDER_STATUSES.map((value) => <SelectItem key={value} value={value}>{value.replaceAll('_', ' ')}</SelectItem>)}</SelectContent></Select><Select value={shopFilter} onValueChange={(value) => { if (value) setShopFilter(value) }} items={Object.fromEntries([['ALL', 'All shops'], ...(shopsForFilter.data?.data ?? []).map((shop) => [shop.id, shop.name])])}><SelectTrigger className="w-44" aria-label="Filter orders by shop"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ALL">All shops</SelectItem>{(shopsForFilter.data?.data ?? []).map((shop) => <SelectItem key={shop.id} value={shop.id}>{shop.name}</SelectItem>)}</SelectContent></Select><Select value={customerFilter} onValueChange={(value) => { if (value) setCustomerFilter(value) }} items={Object.fromEntries([['ALL', 'All customers'], ...(customersForFilter.data?.data ?? []).map((customer) => [customer.id, customer.name])])}><SelectTrigger className="w-44" aria-label="Filter orders by customer"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ALL">All customers</SelectItem>{(customersForFilter.data?.data ?? []).map((customer) => <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>)}</SelectContent></Select><Button variant="outline" onClick={() => { setPage(1); setFilters({ search, status, shopId: shopFilter, customerId: customerFilter }) }}>Apply</Button></div>{isLoading ? <div className="h-48 animate-pulse rounded-lg border bg-muted" /> : isError ? <EmptyState title="Could not load orders" description={getApiErrorMessage(error)} /> : !data?.data.length ? <EmptyState title="No orders found" description="Register an order to begin the delivery lifecycle." /> : <div className="overflow-x-auto rounded-lg border"><Table><TableHeader><TableRow><TableHead>Tracking</TableHead><TableHead>Status</TableHead><TableHead>Shop</TableHead><TableHead>Customer</TableHead><TableHead>COD</TableHead><TableHead>Created</TableHead></TableRow></TableHeader><TableBody>{data.data.map((order) => <TableRow key={order.id} className="cursor-pointer" onClick={() => setSelected(order)}><TableCell className="font-mono font-medium">{order.trackingCode}</TableCell><TableCell><Badge variant="secondary">{order.status.replaceAll('_', ' ')}</Badge></TableCell><TableCell className="font-mono text-xs">{order.shopId}</TableCell><TableCell className="font-mono text-xs">{order.customerId}</TableCell><TableCell className="font-mono">{order.codAmount}</TableCell><TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell></TableRow>)}</TableBody></Table></div>}{data && data.meta.totalPages > 1 && <div className="flex items-center justify-center gap-4"><Button variant="outline" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</Button><span className="text-sm text-muted-foreground">Page {page} of {data.meta.totalPages}</span><Button variant="outline" disabled={page >= data.meta.totalPages} onClick={() => setPage((value) => value + 1)}>Next</Button></div>}<OrderDialog open={creating} pending={createMutation.isPending} onClose={() => setCreating(false)} onSave={async (body) => { await createMutation.mutateAsync(body); toast.success('Order registered'); setCreating(false) }} /><OrderDetail order={selected} onClose={() => setSelected(null)} /></div> }
+const PAGE_SIZE = 20
 
-function OrderDialog({ open, pending, onClose, onSave }: { open: boolean; pending: boolean; onClose: () => void; onSave: (body: OrderBody) => Promise<void> }) { const shops = useContacts('shops', { page: 1, perPage: 100 }); const customers = useContacts('customers', { page: 1, perPage: 100 }); const [shopId, setShopId] = useState(''); const [customerId, setCustomerId] = useState(''); const [deliveryFee, setDeliveryFee] = useState(''); const [codAmount, setCodAmount] = useState(''); const [notes, setNotes] = useState(''); const [message, setMessage] = useState(''); async function submit(event: React.FormEvent<HTMLFormElement>) { event.preventDefault(); if (!shopId || !customerId) { setMessage('Select a shop and customer.'); return } try { await onSave({ shopId, customerId, deliveryFee: deliveryFee || undefined, codAmount: codAmount || undefined, notes: notes || null }) } catch (error) { setMessage(getApiErrorMessage(error)) } } return <Dialog open={open} onOpenChange={(value) => !value && onClose()}><DialogContent><form onSubmit={(event) => void submit(event)} className="flex flex-col gap-4"><DialogHeader><DialogTitle>New order</DialogTitle><DialogDescription>Orders start in PENDING and receive a server-generated tracking code.</DialogDescription></DialogHeader><EntitySelect id="order-shop" label="Shop" value={shopId} onChange={setShopId} options={shops.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []} /><EntitySelect id="order-customer" label="Customer" value={customerId} onChange={setCustomerId} options={customers.data?.data.map((item) => ({ value: item.id, label: item.name })) ?? []} /><div className="grid grid-cols-2 gap-3"><div className="flex flex-col gap-2"><Label htmlFor="delivery-fee">Delivery fee</Label><Input id="delivery-fee" value={deliveryFee} onChange={(event) => setDeliveryFee(event.target.value)} placeholder="0.00" /></div><div className="flex flex-col gap-2"><Label htmlFor="cod-amount">COD amount</Label><Input id="cod-amount" value={codAmount} onChange={(event) => setCodAmount(event.target.value)} placeholder="0.00" /></div></div><div className="flex flex-col gap-2"><Label htmlFor="order-notes">Notes</Label><Input id="order-notes" value={notes} onChange={(event) => setNotes(event.target.value)} /></div>{message && <p className="text-sm text-destructive">{message}</p>}<DialogFooter><DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose><Button type="submit" disabled={pending}>Register order</Button></DialogFooter></form></DialogContent></Dialog> }
-function EntitySelect({ id, label, value, onChange, options }: { id: string; label: string; value: string; onChange: (value: string) => void; options: Array<{ value: string; label: string }> }) { return <div className="flex flex-col gap-2"><Label htmlFor={id}>{label}</Label><Select value={value} onValueChange={(next) => next && onChange(next)} items={Object.fromEntries(options.map((option) => [option.value, option.label]))}><SelectTrigger id={id}><SelectValue placeholder={`Select ${label.toLowerCase()}`} /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div> }
-function OrderDetail({ order, onClose }: { order: Order | null; onClose: () => void }) { const detail = useQuery({ queryKey: ['operations', 'order', order?.id], queryFn: () => fetchOrder(order?.id ?? ''), enabled: !!order }); return <Dialog open={!!order} onOpenChange={(value) => !value && onClose()}><DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>{order?.trackingCode}</DialogTitle><DialogDescription>Server state and immutable order history.</DialogDescription></DialogHeader>{detail.isLoading ? <div className="h-32 animate-pulse rounded bg-muted" /> : detail.data ? <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto"><div className="grid grid-cols-2 gap-3 text-sm"><span>Status <strong>{detail.data.status}</strong></span><span>Delivery fee <strong className="font-mono">{detail.data.deliveryFee}</strong></span><span>COD <strong className="font-mono">{detail.data.codAmount}</strong></span><span>Notes {detail.data.notes || '—'}</span></div><h3 className="font-medium">History</h3>{detail.data.history.map((item) => <div key={item.id} className="border-l-2 border-border pl-3 text-sm"><div className="font-medium">{item.fromStatus ?? 'NEW'} → {item.toStatus}</div><div className="text-muted-foreground">{new Date(item.createdAt).toLocaleString()} {item.note ? `· ${item.note}` : ''}</div></div>)}</div> : <p className="text-sm text-destructive">Could not load order details.</p>}<DialogFooter><Button variant="outline" onClick={onClose}>Close</Button></DialogFooter></DialogContent></Dialog> }
+export function OrdersPage() {
+  const canCreate = usePermission('orders.create')
+  const navigate = useNavigate()
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [status, setStatus] = useState('')
+  const [shopId, setShopId] = useState('')
+  const [townshipId, setTownshipId] = useState('')
+  const [assigneeId, setAssigneeId] = useState('')
+  const [dateFrom, setDateFrom] = useState(() => new Date().toISOString().slice(0, 10))
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().slice(0, 10))
+  const [dateBasis, setDateBasis] = useState<OrderDateBasis>('ENTRY')
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const queryClient = useQueryClient()
+  const shops = useContacts('shops', { page: 1, perPage: 100 })
+  const townships = useQuery({ queryKey: orderKeys.townships, queryFn: fetchTownships })
+  const riders = useQuery({ queryKey: ['operations', 'riders', 'active'], queryFn: () => fetchRiders({ page: 1, perPage: 100, status: 'ACTIVE' }) })
+  const partners = useQuery({ queryKey: orderKeys.partners, queryFn: fetchDeliveryPartners })
+  const filters: OrderFilters = {
+    page,
+    perPage: PAGE_SIZE,
+    search: search.trim() || undefined,
+    status: status ? status as OrderStatus : undefined,
+    shopId: shopId || undefined,
+    townshipId: townshipId || undefined,
+    assigneeId: assigneeId || undefined,
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
+    dateBasis,
+  }
+  const orders = useQuery({ queryKey: orderKeys.list(filters), queryFn: () => fetchOrders(filters) })
+  const createMutation = useMutation({
+    mutationFn: (body: OrderBody) => createOrder(body),
+    onSuccess: async (order) => {
+      await queryClient.invalidateQueries({ queryKey: orderKeys.all })
+      await queryClient.invalidateQueries({ queryKey: wayKeys.all })
+      setIsFormOpen(false)
+      navigate(`/orders/${order.id}`)
+    },
+  })
+
+  function resetToFirstPage(update: () => void) {
+    setPage(1)
+    update()
+  }
+
+  const assigneeOptions = [
+    ...(riders.data?.data ?? []).map((rider) => ({ value: rider.id, label: `${rider.name} · Rider` })),
+    ...(partners.data ?? []).filter((partner) => partner.isActive).map((partner) => ({ value: partner.id, label: `${partner.name} · Partner` })),
+  ]
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Orders</h1>
+          <p className="text-sm text-muted-foreground">Search and manage order delivery, collection, and shop balances.</p>
+        </div>
+        {canCreate && <Button onClick={() => setIsFormOpen(true)}><Plus className="size-4" />Create order</Button>}
+      </div>
+
+      <section aria-label="Order filters" className="grid gap-3 rounded-lg border border-border bg-card p-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="relative flex flex-col gap-2">
+          <label htmlFor="order-search" className="text-sm font-medium">Search</label>
+          <Search className="absolute left-3 top-[2.55rem] size-4 text-muted-foreground" aria-hidden="true" />
+          <Input id="order-search" className="pl-9" value={search} placeholder="Tracking code, name, phone, address" onChange={(event) => resetToFirstPage(() => setSearch(event.target.value))} />
+        </div>
+        <OrderSelectField id="order-filter-status" label="Status" value={status} options={ORDER_STATUSES.map((value) => ({ value, label: value.replaceAll('_', ' ') }))} placeholder="All statuses" onChange={(value) => resetToFirstPage(() => setStatus(value))} />
+        <OrderSelectField id="order-filter-shop" label="Shop" value={shopId} options={(shops.data?.data ?? []).map((shop) => ({ value: shop.id, label: shop.name }))} placeholder="All shops" onChange={(value) => resetToFirstPage(() => setShopId(value))} />
+        <OrderSelectField id="order-filter-township" label="Township" value={townshipId} options={(townships.data ?? []).map((township) => ({ value: township.id, label: township.name }))} placeholder="All townships" onChange={(value) => resetToFirstPage(() => setTownshipId(value))} />
+        <OrderSelectField id="order-filter-assignee" label="Assignee" value={assigneeId} options={assigneeOptions} placeholder="All assignees" onChange={(value) => resetToFirstPage(() => setAssigneeId(value))} />
+        <OrderSelectField id="order-date-basis" label="Date basis" value={dateBasis} options={[{ value: 'ENTRY', label: 'Entry date' }, { value: 'DELIVERED', label: 'Delivered date' }]} onChange={(value) => resetToFirstPage(() => setDateBasis(value as OrderDateBasis))} />
+        <div className="flex flex-col gap-2">
+          <label htmlFor="order-date-from" className="text-sm font-medium">From</label>
+          <Input id="order-date-from" type="date" value={dateFrom} onChange={(event) => resetToFirstPage(() => setDateFrom(event.target.value))} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="order-date-to" className="text-sm font-medium">To</label>
+          <Input id="order-date-to" type="date" value={dateTo} onChange={(event) => resetToFirstPage(() => setDateTo(event.target.value))} />
+        </div>
+      </section>
+
+      {orders.isLoading ? (
+        <div className="space-y-2" aria-label="Loading orders">
+          {[0, 1, 2, 3].map((row) => <div key={row} className="h-12 animate-pulse rounded-md bg-muted" />)}
+        </div>
+      ) : orders.isError ? (
+        <p role="alert" className="rounded-md border border-destructive p-4 text-sm text-destructive">{orders.error.message || 'Could not load orders.'}</p>
+      ) : orders.data?.data.length ? (
+        <>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <Table>
+              <TableHeader><TableRow>
+                <TableHead>Tracking</TableHead><TableHead>Status</TableHead><TableHead>Created</TableHead><TableHead>Est. delivery</TableHead><TableHead className="text-right">COD to collect</TableHead><TableHead className="text-right">Net owed to shop</TableHead>
+              </TableRow></TableHeader>
+              <TableBody>
+                {orders.data.data.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell><Link className="font-mono font-medium underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" to={`/orders/${order.id}`}>{order.trackingCode}</Link></TableCell>
+                    <TableCell><Badge className={order.status === 'DELIVERED' ? 'bg-success text-success-foreground' : order.status === 'AWAITING_APPROVAL' ? 'bg-warning text-warning-foreground' : ''} variant={order.status === 'CANCELLED' ? 'destructive' : 'secondary'}>{order.status.replaceAll('_', ' ')}</Badge></TableCell>
+                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>{order.estimatedDeliveryDate ?? '—'}</TableCell>
+                    <TableCell className="text-right font-mono">{calculateCodToCollect(order)}</TableCell>
+                    <TableCell className="text-right font-mono">{calculateNetOwedToShop(order)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
+            <span>{orders.data.meta.total} orders · Page {orders.data.meta.page} of {Math.max(orders.data.meta.totalPages, 1)}</span>
+            <div className="flex gap-2">
+              <Button variant="outline" disabled={page <= 1} onClick={() => setPage((currentPage) => currentPage - 1)}>Previous</Button>
+              <Button variant="outline" disabled={page >= orders.data.meta.totalPages} onClick={() => setPage((currentPage) => currentPage + 1)}>Next</Button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <EmptyState title="No orders found" description="Adjust the filters or create an order to get started." />
+      )}
+
+      {isFormOpen && <OrderFormDialog
+        open={isFormOpen}
+        order={null}
+        pending={createMutation.isPending}
+        onClose={() => setIsFormOpen(false)}
+        onSave={async (body) => {
+          if (!('shopId' in body) || !('customerId' in body) || !('packagePrice' in body)) throw new Error('Invalid order fields.')
+          await createMutation.mutateAsync(body as OrderBody)
+        }}
+      />}
+    </div>
+  )
+}

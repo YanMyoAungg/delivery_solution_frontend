@@ -7,8 +7,15 @@ import {
   Contact,
   Bike,
   Package,
-  ClipboardList,
+  ClipboardCheck,
+  MapPinned,
+  Handshake,
   Route,
+  Coins,
+  LayoutDashboard,
+  FileBarChart,
+  ClipboardList,
+  WalletCards,
   type LucideIcon,
 } from "lucide-react";
 import type { PermissionKey } from "@/types/permission";
@@ -23,6 +30,12 @@ export interface NavItem {
 
 /** Single source of truth for sidebar + landing redirect. */
 export const NAV_ITEMS: NavItem[] = [
+  { to: "/dashboard", label: "Office dashboard", icon: LayoutDashboard, permission: "reports.read" },
+  { to: "/reports/orders", label: "Order report", icon: FileBarChart, permission: "reports.read" },
+  { to: "/reports/shop-statement", label: "Shop statement", icon: Store, permission: "reports.read" },
+  { to: "/reports/rider-collection", label: "Rider collection", icon: ClipboardList, permission: "reports.read" },
+  { to: "/reports/rider-payout", label: "Rider payout", icon: WalletCards, permission: "reports.read" },
+  { to: "/rider-dashboard", label: "My dashboard", icon: LayoutDashboard, permission: "deliveries.read" },
   { to: "/users", label: "Users", icon: Users, permission: "users.read" },
   { to: "/roles", label: "Roles", icon: UserCog, permission: "roles.read" },
   {
@@ -35,8 +48,12 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/customers", label: "Customers", icon: Contact, permission: "customers.read" },
   { to: "/riders", label: "Riders", icon: Bike, permission: "riders.read" },
   { to: "/orders", label: "Orders", icon: Package, permission: "orders.read" },
-  { to: "/pickups", label: "Pickups", icon: ClipboardList, permission: "pickups.read" },
-  { to: "/deliveries", label: "Deliveries", icon: Route, permission: "deliveries.read" },
+  { to: "/orders/approval", label: "Approval queue", icon: ClipboardCheck, permission: "deliveries.approve" },
+  { to: "/townships", label: "Townships", icon: MapPinned, permission: "townships.read" },
+  { to: "/partners", label: "Delivery partners", icon: Handshake, permission: "partners.read" },
+  { to: "/rider-board", label: "My deliveries", icon: Bike, permission: "deliveries.read" },
+  { to: "/ways", label: "Ways", icon: Route, permission: "ways.read" },
+  { to: "/ways/settings", label: "Commission settings", icon: Coins, permission: "ways.read" },
   { to: "/settings/password", label: "Settings", icon: Settings },
 ];
 

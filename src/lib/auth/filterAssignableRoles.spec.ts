@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { filterAssignableRoles } from './filterAssignableRoles'
+import type { UserResponseDto } from '@/types/user'
 import type { components } from '@/types/api'
 
 type Role = components['schemas']['RoleResponseDto']
-type User = components['schemas']['UserResponseDto']
+type User = UserResponseDto
 
 const SYSTEM_OWNER: Role = {
   id: 'r-owner',
