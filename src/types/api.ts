@@ -272,6 +272,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/riders/assignable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active riders available for order assignment */
+        get: operations["RidersController_listAssignableForOrders_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/riders/{id}": {
         parameters: {
             query?: never;
@@ -301,7 +318,7 @@ export interface paths {
         /** List orders with filters and pagination */
         get: operations["OrdersController_list_v1"];
         put?: never;
-        /** Register an office-received order and assign a rider by township rotation */
+        /** Register an office-received order and assign the selected active rider */
         post: operations["OrdersController_create_v1"];
         delete?: never;
         options?: never;
@@ -864,8 +881,6 @@ export interface components {
             emergencyContactPhone?: Record<string, never> | null;
             /** @example Prefers north townships */
             notes?: Record<string, never> | null;
-            /** @description Township ids this rider serves */
-            townshipIds: string[];
             /** @example 2026-09-18T10:00:00.000Z */
             createdAt: string;
             /** @example 2026-09-18T10:00:00.000Z */
@@ -884,6 +899,11 @@ export interface components {
         RiderListResponseDto: {
             data: components["schemas"]["RiderResponseDto"][];
             meta: components["schemas"]["RiderListMetaDto"];
+        };
+        AssignableRiderResponseDto: {
+            id: string;
+            /** @example John Rider */
+            name: string;
         };
         CreateRiderDto: {
             /** @example John Rider */
@@ -911,8 +931,6 @@ export interface components {
             emergencyContactPhone?: Record<string, never> | null;
             /** @example Prefers north townships */
             notes?: Record<string, never> | null;
-            /** @description Townships this rider serves */
-            townshipIds?: string[];
         };
         UpdateRiderDto: {
             /** @example John Rider Updated */
@@ -936,8 +954,6 @@ export interface components {
             emergencyContactPhone?: Record<string, never> | null;
             /** @example Prefers north townships */
             notes?: Record<string, never> | null;
-            /** @description Replace township coverage */
-            townshipIds?: string[];
         };
         /** @enum {string} */
         OrderStatus: "ASSIGNED" | "DELIVERED" | "FAILED";
@@ -1001,6 +1017,8 @@ export interface components {
         CreateOrderDto: {
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             townshipId: string;
+            /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
+            riderId: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
             shopId: string;
             /** @example 3fa85f64-5717-4562-b3fc-2c963f66afa6 */
@@ -1079,18 +1097,22 @@ export interface components {
             id: string;
             /** @example Hlaing */
             name: string;
-            /** @description Whether an ACTIVE rider is assigned to this township */
-            selectable: boolean;
+            /** @example 3500.00 */
+            defaultDeliveryFee: string;
             createdAt: string;
             updatedAt: string;
         };
         CreateTownshipDto: {
             /** @example Hlaing */
             name: string;
+            /** @example 3500.00 */
+            defaultDeliveryFee: string;
         };
         UpdateTownshipDto: {
             /** @example Hlaing */
             name?: string;
+            /** @example 3500.00 */
+            defaultDeliveryFee?: string;
         };
         AssignDeliveryDto: {
             riderId: string;
@@ -1159,21 +1181,24 @@ export interface components {
             townshipId: string;
             townshipName: string;
             shopName: string;
-            assignedRiderName?: Record<string, never> | null;
-            deliveryAttemptId?: string;
-            attemptNumber?: number;
+            deliveryAttemptId: string;
+            attemptNumber: number;
+            /**
+             * @deprecated
+             * @description Always true; retained temporarily for rider-client compatibility.
+             */
             isMine: boolean;
             createdAt: string;
-            customerId?: string | null;
-            customerName?: string | null;
-            customerPhone?: Record<string, never> | null;
-            customerAddress?: Record<string, never> | null;
-            packageInfo?: Record<string, never> | null;
+            customerId: string;
+            customerName: string;
+            customerPhone: Record<string, never> | null;
+            customerAddress: Record<string, never> | null;
+            packageInfo: Record<string, never> | null;
             /** @example 0.00 */
-            deliveryFee?: string;
+            deliveryFee: string;
             /** @example 0.00 */
-            codAmount?: string;
-            notes?: Record<string, never> | null;
+            codAmount: string;
+            notes: Record<string, never> | null;
         };
         RiderBoardMetaDto: {
             page: number;
@@ -1184,8 +1209,6 @@ export interface components {
         RiderBoardResponseDto: {
             /** @example 2026-09-29 */
             date: string;
-            /** @enum {string} */
-            filter: "mine" | "all";
             data: components["schemas"]["RiderBoardOrderDto"][];
             meta: components["schemas"]["RiderBoardMetaDto"];
         };
@@ -1907,6 +1930,25 @@ export interface operations {
             };
         };
     };
+    RidersController_listAssignableForOrders_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignableRiderResponseDto"][];
+                };
+            };
+        };
+    };
     RidersController_get_v1: {
         parameters: {
             query?: never;
@@ -2068,10 +2110,7 @@ export interface operations {
     };
     TownshipsController_list_v1: {
         parameters: {
-            query?: {
-                /** @description Only return townships with an active rider */
-                selectable?: boolean;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -2321,8 +2360,12 @@ export interface operations {
     RiderBoardController_board_v1: {
         parameters: {
             query?: {
-                /** @description Office-local calendar date; defaults to today */
+                /** @description Order-creation date in the office timezone; defaults to today */
                 date?: string;
+                /**
+                 * @deprecated
+                 * @description Ignored. Results are always limited to the authenticated rider.
+                 */
                 filter?: "mine" | "all";
                 page?: number;
                 perPage?: number;

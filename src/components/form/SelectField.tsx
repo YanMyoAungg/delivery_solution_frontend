@@ -34,6 +34,12 @@ interface SelectFieldProps<TFieldValues extends FieldValues> {
   placeholder?: string
   required?: boolean
   disabled?: boolean
+  /**
+   * Fires after `field.onChange` with the selected value. Lets a caller react
+   * to a selection (e.g. prefill a dependent field) without a render-time
+   * `watch()` subscription.
+   */
+  onValueChange?: (value: string) => void
 }
 
 /**
@@ -56,6 +62,7 @@ export function SelectField<TFieldValues extends FieldValues>({
   placeholder,
   required,
   disabled,
+  onValueChange,
 }: SelectFieldProps<TFieldValues>) {
   const items = useMemo(
     () => Object.fromEntries(options.map((o) => [o.value, o.label])),
@@ -77,7 +84,11 @@ export function SelectField<TFieldValues extends FieldValues>({
             items={items}
             value={toSelectValue(field.value)}
             disabled={disabled}
-            onValueChange={(next) => field.onChange(next ?? '')}
+            onValueChange={(next) => {
+              const value = next ?? ''
+              field.onChange(value)
+              onValueChange?.(value)
+            }}
           >
             <SelectTrigger
               id={htmlFor}

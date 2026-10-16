@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { http } from '@/lib/api/client'
 import { customersKeys } from '@/features/customers/api'
 import { shopsKeys } from '@/features/shops/api'
-import { townshipsKeys } from '@/features/townships/api'
 import type { components } from '@/types/api'
 
 export type Order = components['schemas']['OrderResponseDto']
@@ -19,6 +18,7 @@ export interface OrdersFilters {
 
 export interface CreateOrderBody {
   townshipId: string
+  riderId: string
   shopId: string
   customerId: string
   packageInfo?: Record<string, unknown> | null
@@ -48,14 +48,6 @@ export async function createOrder(body: CreateOrderBody): Promise<Order> {
   return response.data
 }
 
-export function useSelectableTownships() {
-  return useQuery({
-    queryKey: townshipsKeys.list(true),
-    queryFn: () => http.get<components['schemas']['TownshipResponseDto'][]>('/townships', { params: { selectable: true } }).then((response) => response.data),
-    staleTime: 30_000,
-  })
-}
-
 export function useOrders(filters: OrdersFilters) {
   return useQuery({ queryKey: ordersKeys.list(filters), queryFn: () => fetchOrders(filters) })
 }
@@ -71,7 +63,6 @@ export function useCreateOrder() {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ordersKeys.all }),
-        queryClient.invalidateQueries({ queryKey: townshipsKeys.all }),
         queryClient.invalidateQueries({ queryKey: shopsKeys.all }),
         queryClient.invalidateQueries({ queryKey: customersKeys.all }),
       ])

@@ -4,9 +4,9 @@ import { usePermission } from '@/lib/auth/usePermission'
 import { readApiError } from '@/lib/api/client'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/EmptyState'
+import { formatDecimalAmount } from '@/lib/utils'
 import { TownshipDialog } from './components/TownshipDialog'
 import { useTownships, type Township } from './api'
 
@@ -37,7 +37,7 @@ export function TownshipsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Townships</h1>
-          <p className="text-sm text-muted-foreground">Create delivery areas and track rider coverage. Order availability follows active rider coverage.</p>
+          <p className="text-sm text-muted-foreground">Delivery areas and their default delivery fee. The fee prefills order entry and can be overridden per order.</p>
         </div>
         {canCreate && (
           <Button onClick={openCreateDialog}>
@@ -51,14 +51,14 @@ export function TownshipsPage() {
       ) : isError ? (
         <EmptyState title="Could not load townships" description={readApiError(error).message ?? 'Unexpected error'} />
       ) : townships.length === 0 ? (
-        <EmptyState title="No townships configured" description="Create a township, then assign it to an active rider before using it for orders." />
+        <EmptyState title="No townships configured" description="Create a township and set its default delivery fee before registering orders." />
       ) : (
         <div className="overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Township</TableHead>
-                <TableHead>Order entry</TableHead>
+                <TableHead>Default delivery fee</TableHead>
                 {canUpdate && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
@@ -66,17 +66,13 @@ export function TownshipsPage() {
               {townships.map((township) => (
                 <TableRow key={township.id}>
                   <TableCell className="font-medium">{township.name}</TableCell>
-                  <TableCell>
-                    <Badge variant={township.selectable ? 'default' : 'secondary'}>
-                      {township.selectable ? 'Selectable' : 'No active rider'}
-                    </Badge>
-                  </TableCell>
+                  <TableCell className="font-mono tabular-nums">{formatDecimalAmount(township.defaultDeliveryFee)}</TableCell>
                   {canUpdate && (
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={`Rename ${township.name}`}
+                        aria-label={`Edit ${township.name}`}
                         onClick={() => openEditDialog(township)}
                       >
                         <Pencil className="size-3.5" />

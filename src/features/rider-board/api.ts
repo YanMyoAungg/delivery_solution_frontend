@@ -9,7 +9,6 @@ export type FailureReason = components['schemas']['FailureReason']
 
 export interface RiderBoardFilters {
   date: string
-  filter: 'mine' | 'all'
   page: number
   perPage: number
 }

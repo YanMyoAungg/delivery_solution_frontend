@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toUserStatus, userStatusLabel, userStatusTone } from '@/lib/constants/user-status'
 import type { Rider } from '../api'
 import { vehicleTypeLabel } from '../vehicle-types'
-import { useTownships } from '@/features/townships/api'
 
 interface RidersTableProps {
   riders: Rider[]
@@ -26,7 +25,6 @@ export function RidersTable({
   onEdit,
   onDelete,
 }: RidersTableProps) {
-  const { data: townships = [] } = useTownships()
   return (
     <div className="overflow-x-auto rounded-lg border">
       <Table>
@@ -36,7 +34,6 @@ export function RidersTable({
             <TableHead>Email</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Vehicle type</TableHead>
-            <TableHead>Township coverage</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
             {(canUpdate || canDelete) && <TableHead className="text-right">Actions</TableHead>}
@@ -59,9 +56,6 @@ export function RidersTable({
                   <Badge variant="secondary">
                     {vehicleTypeLabel(rider.vehicleType)}
                   </Badge>
-                </TableCell>
-                <TableCell>
-                  {rider.townshipIds.map((townshipId) => townships.find((township) => township.id === townshipId)?.name ?? townshipId).join(', ') || 'No coverage'}
                 </TableCell>
                 <TableCell>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClass(userStatusTone(status))}`}>

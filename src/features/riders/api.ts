@@ -2,12 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { UserStatusValue } from '@/lib/constants/user-status'
 import { http } from '@/lib/api/client'
 import { usersKeys } from '@/features/users/api'
-import { townshipsKeys } from '@/features/townships/api'
 import type { components } from '@/types/api'
 
 export type Rider = components['schemas']['RiderResponseDto']
 type RiderList = components['schemas']['RiderListResponseDto']
 export type RiderVehicleType = components['schemas']['RiderVehicleType']
+export type AssignableRider = components['schemas']['AssignableRiderResponseDto']
 
 /**
  * Explicit DTOs. Codegen stubs the nullable strings as `Record<string, never>`;
@@ -29,7 +29,6 @@ export interface CreateRiderBody {
   vehiclePlate?: string | null
   nrcNumber?: string | null
   emergencyContactPhone?: string | null
-  townshipIds?: string[]
   notes?: string | null
 }
 
@@ -42,7 +41,6 @@ export interface UpdateRiderBody {
   vehiclePlate?: string | null
   nrcNumber?: string | null
   emergencyContactPhone?: string | null
-  townshipIds?: string[]
   notes?: string | null
 }
 
@@ -55,7 +53,8 @@ export interface RidersFilters {
 
 export const ridersKeys = {
   all: ['riders'] as const,
-  list: (filters: RidersFilters) => ['riders', filters] as const,
+  list: (filters: RidersFilters) => ['riders', 'list', filters] as const,
+  assignable: ['riders', 'assignable'] as const,
 }
 
 /* ---- API functions ---- */
@@ -64,6 +63,11 @@ export async function fetchRiders(
   filters: RidersFilters,
 ): Promise<RiderList> {
   const response = await http.get<RiderList>('/riders', { params: filters })
+  return response.data
+}
+
+export async function fetchAssignableRiders(): Promise<AssignableRider[]> {
+  const response = await http.get<AssignableRider[]>('/riders/assignable')
   return response.data
 }
 
@@ -93,6 +97,19 @@ export function useRiders(filters: RidersFilters) {
   })
 }
 
+/**
+ * Active riders eligible for office order assignment. Backs the order create
+ * form's rider selector; requires `orders.create`. The list is independent of
+ * the selected township.
+ */
+export function useAssignableRiders() {
+  return useQuery({
+    queryKey: ridersKeys.assignable,
+    queryFn: fetchAssignableRiders,
+    staleTime: 30_000,
+  })
+}
+
 export function useCreateRider() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -101,7 +118,6 @@ export function useCreateRider() {
       // A rider creates a backing user row → both lists stale.
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
-      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }
@@ -114,7 +130,6 @@ export function useUpdateRider() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
-      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }
@@ -126,7 +141,6 @@ export function useDeleteRider() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ridersKeys.all })
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
-      queryClient.invalidateQueries({ queryKey: townshipsKeys.all })
     },
   })
 }

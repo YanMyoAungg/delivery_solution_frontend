@@ -30,6 +30,16 @@ export function formatDate(value: string): string {
 }
 
 /**
+ * Group the integer part of a decimal string for display, preserving the
+ * fraction exactly as the API returned it (`12000.00` → `12,000.00`).
+ * Display only — never feed the result back into a calculation.
+ */
+export function formatDecimalAmount(value: string): string {
+  const [whole, fraction = '00'] = value.split('.')
+  return `${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${fraction}`
+}
+
+/**
  * Tone classes for a `<Badge>` or an equivalent pill. Colour only — size and
  * shape come from the component, so this composes with any of them.
  */

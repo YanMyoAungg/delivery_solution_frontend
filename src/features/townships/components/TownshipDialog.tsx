@@ -37,8 +37,12 @@ export function TownshipDialog({ open, township, onClose }: TownshipDialogProps)
   async function onValid(values: TownshipValues) {
     form.clearErrors('root')
     try {
-      await saveTownshipMutation.mutateAsync({ id: township?.id, name: values.name })
-      toast.success(isEditing ? 'Township renamed' : 'Township created')
+      await saveTownshipMutation.mutateAsync({
+        id: township?.id,
+        name: values.name,
+        defaultDeliveryFee: values.defaultDeliveryFee,
+      })
+      toast.success(isEditing ? 'Township updated' : 'Township created')
       handleClose()
     } catch (error) {
       form.setError('root', { message: getApiErrorMessage(error) })
@@ -50,9 +54,11 @@ export function TownshipDialog({ open, township, onClose }: TownshipDialogProps)
       <DialogContent className="sm:max-w-md">
         <Form form={form} onValid={onValid}>
           <DialogHeader>
-            <DialogTitle>{isEditing ? 'Rename township' : 'New township'}</DialogTitle>
+            <DialogTitle>{isEditing ? 'Edit township' : 'New township'}</DialogTitle>
             <DialogDescription>
-              {isEditing ? 'Update the township name.' : 'Create a delivery area for rider coverage.'}
+              {isEditing
+                ? 'Update the township name and its default delivery fee.'
+                : 'Create a delivery area and set its default delivery fee.'}
             </DialogDescription>
           </DialogHeader>
 

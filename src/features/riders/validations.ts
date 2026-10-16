@@ -16,7 +16,6 @@ const riderProfileFields = {
     .string()
     .max(50, 'Emergency contact phone must be at most 50 characters')
     .nullable(),
-  townshipIds: z.array(z.string()),
   notes: z.string().max(500, 'Notes must be at most 500 characters').nullable(),
 }
 

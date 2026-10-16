@@ -1,9 +1,7 @@
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { USER_STATUS_OPTIONS } from '@/lib/constants/user-status'
 import { SelectField } from '@/components/form/SelectField'
 import { TextField } from '@/components/form/TextField'
-import { useTownships } from '@/features/townships/api'
-import { Checkbox } from '@/components/ui/checkbox'
 import type { RiderValues } from '../validations'
 import { VEHICLE_TYPE_OPTIONS } from '../vehicle-types'
 
@@ -25,7 +23,6 @@ interface RiderFormFieldsProps {
  * forms for the same entity.
  */
 export function RiderFormFields({ isEditing, readOnlyEmail }: RiderFormFieldsProps) {
-  const { data: townships = [] } = useTownships()
   const {
     control,
     register,
@@ -141,36 +138,6 @@ export function RiderFormFields({ isEditing, readOnlyEmail }: RiderFormFieldsPro
             label="Notes"
             error={errors.notes?.message}
           />
-          <fieldset className="flex flex-col gap-2">
-            <legend className="text-sm font-medium">Township coverage</legend>
-            <p className="text-xs text-muted-foreground">Active riders with coverage can receive township assignments.</p>
-            <div className="grid max-h-40 grid-cols-1 gap-1 overflow-y-auto rounded-md border p-2 sm:grid-cols-2">
-              <Controller
-                control={control}
-                name="townshipIds"
-                render={({ field }) => (
-                  <>
-                    {townships.map((township) => (
-                      <label key={township.id} className="flex min-h-10 items-center gap-2 rounded px-2 text-sm hover:bg-accent">
-                        <Checkbox
-                          id={`rider-township-${township.id}`}
-                          checked={field.value.includes(township.id)}
-                          onCheckedChange={(checked) => field.onChange(
-                            checked
-                              ? [...field.value, township.id]
-                              : field.value.filter((townshipId) => townshipId !== township.id),
-                          )}
-                          aria-label={township.name}
-                        />
-                        <span className="font-normal">{township.name}{township.selectable ? '' : ' · no active rider'}</span>
-                      </label>
-                    ))}
-                  </>
-                )}
-              />
-            </div>
-            {errors.townshipIds?.message && <p className="text-xs text-destructive">{errors.townshipIds.message}</p>}
-          </fieldset>
         </div>
       </fieldset>
     </>

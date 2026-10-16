@@ -20,7 +20,6 @@ export const EMPTY_RIDER: RiderValues = {
   vehiclePlate: '',
   nrcNumber: '',
   emergencyContactPhone: '',
-  townshipIds: [],
   notes: '',
 }
 
@@ -46,7 +45,6 @@ export function toRiderFormValues(rider: Rider | undefined): RiderValues {
     vehiclePlate: toNullableString(rider.vehiclePlate ?? null) ?? '',
     nrcNumber: toNullableString(rider.nrcNumber ?? null) ?? '',
     emergencyContactPhone: toNullableString(rider.emergencyContactPhone ?? null) ?? '',
-    townshipIds: rider.townshipIds,
     notes: toNullableString(rider.notes ?? null) ?? '',
   }
 }
@@ -66,7 +64,6 @@ export function toRiderProfileBody(values: RiderValues) {
     vehiclePlate: values.vehiclePlate || null,
     nrcNumber: values.nrcNumber || null,
     emergencyContactPhone: values.emergencyContactPhone || null,
-    townshipIds: values.townshipIds,
     notes: values.notes || null,
   }
 }
