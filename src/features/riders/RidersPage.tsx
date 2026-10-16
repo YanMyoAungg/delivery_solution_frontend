@@ -1,28 +1,138 @@
-import { useMemo, useState } from 'react'
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { usePermission } from '@/lib/auth/gate'
-import { getApiErrorMessage } from '@/lib/api/client'
-import { PAGE_SIZE } from '@/lib/constants'
-import { createRider, deleteRider, fetchRiders, operationKeys, updateRider, type OperationStatus, type Rider, type RiderBody } from '@/features/operations/api'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { EmptyState } from '@/components/EmptyState'
+import { usePermission } from '@/lib/auth/usePermission'
+import { readApiError } from '@/lib/api/client'
+import { useAuthStore } from '@/lib/store/auth.store'
+import { useRiders, useDeleteRider, type Rider, type RidersFilters } from './api'
+import type { UserStatusValue } from '@/lib/constants/user-status'
+import { RidersToolbar } from './components/RidersToolbar'
+import { RidersTable } from './components/RidersTable'
+import { RiderDialog } from './components/RiderDialog'
 import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
+import { EmptyState } from '@/components/EmptyState'
+import { PAGE_SIZE } from '@/lib/constants'
 
 export function RidersPage() {
-  const canCreate = usePermission('riders.create'); const canUpdate = usePermission('riders.update'); const canDelete = usePermission('riders.delete')
-  const [search, setSearch] = useState(''); const [status, setStatus] = useState<'ALL' | OperationStatus>('ALL'); const [page, setPage] = useState(1); const [applied, setApplied] = useState({ search: '', status: 'ALL' as 'ALL' | OperationStatus }); const [editing, setEditing] = useState<Rider | null>(null); const [deleting, setDeleting] = useState<Rider | null>(null)
-  const params = useMemo(() => ({ page, perPage: PAGE_SIZE, search: applied.search || undefined, status: applied.status === 'ALL' ? undefined : applied.status }), [page, applied])
-  const { data, isLoading, isError, error } = useQuery({ queryKey: operationKeys.contacts('riders', params), queryFn: () => fetchRiders(params) }); const queryClient = useQueryClient()
-  const save = useMutation({ mutationFn: (input: { id?: string; body: RiderBody }) => input.id ? updateRider(input.id, input.body) : createRider(input.body as Required<Pick<RiderBody, 'name' | 'email' | 'password'>> & RiderBody), onSuccess: () => queryClient.invalidateQueries({ queryKey: operationKeys.all }) }); const remove = useMutation({ mutationFn: deleteRider, onSuccess: () => queryClient.invalidateQueries({ queryKey: operationKeys.all }) })
-  return <div className="flex flex-col gap-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-xl font-semibold tracking-tight">Riders</h1><p className="text-sm text-muted-foreground">Manage active delivery accounts and assignment capacity.</p></div>{canCreate && <Button onClick={() => setEditing({ id: '', userId: '', name: '', email: '', phone: null, status: 'ACTIVE', createdAt: '', updatedAt: '' })}><Plus className="size-4" />New rider</Button>}</div><div className="flex flex-wrap gap-2"><div className="relative max-w-sm flex-1"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input className="pl-9" value={search} placeholder="Search name, email, phone..." aria-label="Search riders" onChange={(event) => setSearch(event.target.value)} /></div><Select value={status} onValueChange={(value) => { if (value === 'ALL' || value === 'ACTIVE' || value === 'INACTIVE') setStatus(value) }} items={{ ALL: 'All statuses', ACTIVE: 'Active', INACTIVE: 'Inactive' }}><SelectTrigger className="w-36" aria-label="Filter riders by status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ALL">All statuses</SelectItem><SelectItem value="ACTIVE">Active</SelectItem><SelectItem value="INACTIVE">Inactive</SelectItem></SelectContent></Select><Button variant="outline" onClick={() => { setPage(1); setApplied({ search, status }) }}>Apply</Button></div>{isLoading ? <div className="h-48 animate-pulse rounded-lg border bg-muted" /> : isError ? <EmptyState title="Could not load riders" description={getApiErrorMessage(error)} /> : !data?.data.length ? <EmptyState title="No riders found" description="Create a rider account to assign deliveries." /> : <div className="overflow-x-auto rounded-lg border"><Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Status</TableHead><TableHead>Created</TableHead>{(canUpdate || canDelete) && <TableHead className="text-right">Actions</TableHead>}</TableRow></TableHeader><TableBody>{data.data.map((rider) => <TableRow key={rider.id}><TableCell className="font-medium">{rider.name}</TableCell><TableCell>{rider.email}</TableCell><TableCell>{rider.phone || '—'}</TableCell><TableCell><Badge variant="secondary">{rider.status}</Badge></TableCell><TableCell>{new Date(rider.createdAt).toLocaleDateString()}</TableCell>{(canUpdate || canDelete) && <TableCell className="text-right"><div className="flex justify-end gap-1">{canUpdate && <Button variant="ghost" size="icon-sm" aria-label={`Edit ${rider.name}`} onClick={() => setEditing(rider)}><Pencil className="size-3.5" /></Button>}{canDelete && <Button variant="ghost" size="icon-sm" aria-label={`Delete ${rider.name}`} onClick={() => setDeleting(rider)}><Trash2 className="size-3.5 text-destructive" /></Button>}</div></TableCell>}</TableRow>)}</TableBody></Table></div>}<RiderDialog key={editing?.id ?? 'closed'} rider={editing} pending={save.isPending} onClose={() => setEditing(null)} onSave={async (body) => { await save.mutateAsync({ id: editing?.id || undefined, body }); toast.success(editing?.id ? 'Rider updated' : 'Rider created'); setEditing(null) }} /><DeleteConfirmDialog open={!!deleting} onClose={() => setDeleting(null)} title="Delete rider?" description={`This removes ${deleting?.name ?? 'this rider'} and their login account.`} onConfirm={async () => { if (deleting) await remove.mutateAsync(deleting.id) }} /></div>
-}
+  const [filters, setFilters] = useState<RidersFilters>({ page: 1, perPage: PAGE_SIZE })
+  // Local select states — bundled into filters only on Apply (ShopsPage pattern).
+  const [searchInput, setSearchInput] = useState('')
+  const [status, setStatus] = useState<UserStatusValue | undefined>(undefined)
 
-function RiderDialog({ rider, pending, onClose, onSave }: { rider: Rider | null; pending: boolean; onClose: () => void; onSave: (body: RiderBody) => Promise<void> }) { const isNew = !!rider && !rider.id; const [name, setName] = useState(rider?.name ?? ''); const [email, setEmail] = useState(rider?.email ?? ''); const [phone, setPhone] = useState(rider?.phone ?? ''); const [password, setPassword] = useState(''); const [status, setStatus] = useState<OperationStatus>(rider?.status ?? 'ACTIVE'); const [message, setMessage] = useState(''); if (!rider) return null; async function submit(event: React.FormEvent<HTMLFormElement>) { event.preventDefault(); if (!name.trim() || !email.trim() || (isNew && password.length < 8)) { setMessage(isNew ? 'Name, valid email, and an 8-character password are required.' : 'Name and email are required.'); return } try { await onSave({ name, email, phone: phone || null, ...(password ? { password } : {}), status }) } catch (error) { setMessage(getApiErrorMessage(error)) } } return <Dialog open onOpenChange={(open) => !open && onClose()}><DialogContent><form onSubmit={(event) => void submit(event)} className="flex flex-col gap-4"><DialogHeader><DialogTitle>{isNew ? 'New rider' : 'Edit rider'}</DialogTitle><DialogDescription>Riders are linked login accounts with the fixed RIDER role.</DialogDescription></DialogHeader><div className="flex flex-col gap-2"><Label htmlFor="rider-name">Name</Label><Input id="rider-name" value={name} onChange={(event) => setName(event.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="rider-email">Email</Label><Input id="rider-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="rider-phone">Phone</Label><Input id="rider-phone" value={phone} onChange={(event) => setPhone(event.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="rider-password">{isNew ? 'Password' : 'Reset password (optional)'}</Label><Input id="rider-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="rider-status">Status</Label><Select value={status} onValueChange={(value) => { if (value === 'ACTIVE' || value === 'INACTIVE') setStatus(value) }} items={{ ACTIVE: 'Active', INACTIVE: 'Inactive' }}><SelectTrigger id="rider-status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ACTIVE">Active</SelectItem><SelectItem value="INACTIVE">Inactive</SelectItem></SelectContent></Select></div>{message && <p className="text-sm text-destructive">{message}</p>}<DialogFooter><DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose><Button type="submit" disabled={pending}>{isNew ? 'Create rider' : 'Save changes'}</Button></DialogFooter></form></DialogContent></Dialog> }
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [riderToEdit, setRiderToEdit] = useState<Rider | undefined>(undefined)
+  const [riderToDelete, setRiderToDelete] = useState<Rider | null>(null)
+
+  // Rider `userId` links the profile to the authenticated account; deleting yourself destroys your login.
+  const currentUser = useAuthStore((state) => state.user)
+
+  const canCreate = usePermission('riders.create')
+  const canUpdate = usePermission('riders.update')
+  const canDelete = usePermission('riders.delete')
+
+  const { data, isLoading, isError, error } = useRiders(filters)
+  const deleteRiderMutation = useDeleteRider()
+
+  function applyFilters() {
+    setFilters((prev) => ({
+      page: 1,
+      perPage: prev.perPage,
+      search: searchInput || undefined,
+      status,
+    }))
+  }
+
+  function resetFilters() {
+    setSearchInput('')
+    setStatus(undefined)
+    setFilters({ page: 1, perPage: PAGE_SIZE })
+  }
+
+  const hasFilters = !!filters.search || !!filters.status
+  // Apply is enabled only when the local draft differs from the committed filters.
+  const hasPendingChanges =
+    (searchInput || undefined) !== filters.search ||
+    status !== filters.status
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Riders</h1>
+          <p className="text-sm text-muted-foreground">Manage delivery riders and their vehicles.</p>
+        </div>
+        {canCreate && (
+          <Button onClick={() => { setRiderToEdit(undefined); setDialogOpen(true) }}>
+            <Plus className="size-4" />New rider
+          </Button>
+        )}
+      </div>
+
+      <RidersToolbar
+        searchInput={searchInput}
+        status={status}
+        hasFilters={hasFilters}
+        hasPendingChanges={hasPendingChanges}
+        onSearchInputChange={setSearchInput}
+        onSearchSubmit={applyFilters}
+        onStatusChange={setStatus}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
+
+      {isLoading ? (
+        <div className="flex flex-col gap-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+      ) : isError ? (
+        <EmptyState title="Could not load riders" description={readApiError(error).message ?? 'Unexpected error'} />
+      ) : data && data.data.length === 0 ? (
+        <EmptyState title="No riders found" description={hasFilters ? 'No riders match your filters. Try widening the search.' : 'Create a rider to get started.'} />
+      ) : (
+        <RidersTable
+          riders={data?.data ?? []}
+          canUpdate={canUpdate}
+          canDelete={canDelete}
+          currentUserId={currentUser?.id ?? null}
+          onEdit={(rider) => { setRiderToEdit(rider); setDialogOpen(true) }}
+          onDelete={setRiderToDelete}
+        />
+      )}
+
+      {data && data.meta.totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious onClick={() => setFilters((p) => ({ ...p, page: p.page - 1 }))} />
+            </PaginationItem>
+            <PaginationItem>
+              <span className="text-sm text-muted-foreground">Page {filters.page} of {data.meta.totalPages}</span>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext onClick={() => setFilters((p) => ({ ...p, page: p.page + 1 }))} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
+
+      <RiderDialog
+        open={dialogOpen}
+        rider={riderToEdit}
+        onClose={() => { setDialogOpen(false); setRiderToEdit(undefined) }}
+      />
+
+      <DeleteConfirmDialog
+        open={!!riderToDelete}
+        onClose={() => setRiderToDelete(null)}
+        title="Delete rider?"
+        description={`This permanently removes ${riderToDelete?.name ?? 'the rider'} and destroys their login account. This action cannot be undone.`}
+        onConfirm={async () => {
+          if (!riderToDelete) return
+          await deleteRiderMutation.mutateAsync(riderToDelete.id)
+          toast.success('Rider deleted')
+        }}
+      />
+    </div>
+  )
+}

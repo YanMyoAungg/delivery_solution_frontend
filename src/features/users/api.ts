@@ -1,13 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { http } from '@/lib/api/client'
 import { rolesKeys } from '@/features/roles/api'
-import { operationKeys } from '@/features/operations/api'
 import type { components } from '@/types/api'
-import type { UserResponseDto } from '@/types/user'
 
-type User = UserResponseDto
-type GeneratedUserList = components['schemas']['UserListResponseDto']
-type UserList = Omit<GeneratedUserList, 'data'> & { data: User[] }
+export type User = components['schemas']['UserResponseDto']
+type UserList = components['schemas']['UserListResponseDto']
 
 /**
  * Explicit DTOs. Codegen types `phone` as `Record<string, never>` (thin stub);
@@ -19,7 +16,6 @@ export interface CreateUserBody {
   email: string
   phone?: string | null
   roleId: string
-  shopId?: string | null
   password: string
   status?: components['schemas']['UserStatus']
 }
@@ -29,7 +25,6 @@ export interface UpdateUserBody {
   email?: string
   phone?: string | null
   roleId?: string
-  shopId?: string | null
   status?: components['schemas']['UserStatus']
   password?: string
 }
@@ -87,10 +82,9 @@ export function useCreateUser() {
   return useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      // User changes affect role counts and whether a shop has a login.
+      // Roles expose userCount — a user change alters it, so invalidate both.
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
       queryClient.invalidateQueries({ queryKey: rolesKeys.all })
-      queryClient.invalidateQueries({ queryKey: operationKeys.shops })
     },
   })
 }
@@ -103,7 +97,6 @@ export function useUpdateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
       queryClient.invalidateQueries({ queryKey: rolesKeys.all })
-      queryClient.invalidateQueries({ queryKey: operationKeys.shops })
     },
   })
 }
@@ -115,7 +108,6 @@ export function useDeleteUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: usersKeys.all })
       queryClient.invalidateQueries({ queryKey: rolesKeys.all })
-      queryClient.invalidateQueries({ queryKey: operationKeys.shops })
     },
   })
 }

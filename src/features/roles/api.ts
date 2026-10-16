@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { http } from '@/lib/api/client'
 import type { components } from '@/types/api'
 
-type Role = components['schemas']['RoleResponseDto']
+export type Role = components['schemas']['RoleResponseDto']
 type CreateRoleResponse = components['schemas']['CreateRoleResponseDto']
 type UpdateRoleResponse = components['schemas']['UpdateRoleResponseDto']
 

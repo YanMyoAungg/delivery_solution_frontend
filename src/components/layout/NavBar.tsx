@@ -11,10 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { UserResponseDto } from "@/types/user";
+import type { components } from "@/types/api";
+
+type User = components["schemas"]["UserResponseDto"];
 
 /** Topbar account menu: user name + role badge + Change Password / Logout. */
-export function Navbar({ user }: { user: UserResponseDto }) {
+export function Navbar({ user }: { user: User }) {
   const navigate = useNavigate();
   const clearSession = useAuthStore((state) => state.clearSession);
 

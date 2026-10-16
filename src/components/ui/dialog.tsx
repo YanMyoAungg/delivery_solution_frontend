@@ -53,7 +53,23 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          // `flex flex-col` + a viewport-capped height is what makes long forms
+          // usable: it turns the popup into a bounded column, so a child with
+          // `flex-1 min-h-0 overflow-y-auto` (see `FormBody`) can scroll the
+          // fields while the header and the submit button stay pinned.
+          //
+          // Without the cap this was a hard bug, not a cosmetic one. The popup is
+          // `fixed` and centred with `-translate-y-1/2`, so content taller than
+          // the viewport overflowed *equally above and below* the screen edge
+          // with no scroll container anywhere — `body` can't scroll a `fixed`
+          // element, so the rider form's first fieldset and its Save button were
+          // both physically unreachable on a laptop.
+          //
+          // `dvh` rather than `vh` so the mobile browser chrome collapsing
+          // doesn't leave the footer under it; `supports-` keeps `vh` as the
+          // fallback instead of relying on Tailwind's class ordering to pick a
+          // winner between two conflicting `max-h-*` utilities.
+          "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-hidden rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -84,7 +100,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex shrink-0 flex-col gap-2", className)}
       {...props}
     />
   )
@@ -102,7 +118,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
+        "-mx-4 -mb-4 flex shrink-0 flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
         className
       )}
       {...props}

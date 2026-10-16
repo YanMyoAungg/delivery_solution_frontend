@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/lib/store/auth.store'
-import { usePermission } from '@/lib/auth/gate'
+import { usePermission } from '@/lib/auth/usePermission'
 import { filterAssignableRoles } from '@/lib/auth/filterAssignableRoles'
 import { readApiError } from '@/lib/api/client'
 import { useRoles } from '@/features/roles/api'
@@ -16,10 +16,9 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { EmptyState } from '@/components/EmptyState'
-import type { UserResponseDto } from '@/types/user'
 import type { components } from '@/types/api'
 
-type User = UserResponseDto
+type User = components['schemas']['UserResponseDto']
 type UserStatus = components['schemas']['UserStatus']
 
 export function UsersPage() {
@@ -60,6 +59,11 @@ export function UsersPage() {
   }
 
   const hasFilters = !!(filters.search || filters.roleId || filters.status)
+  // Apply is enabled only when the local draft differs from the committed filters.
+  const hasPendingChanges =
+    (searchInput || undefined) !== filters.search ||
+    (roleFilter === 'ALL' ? undefined : roleFilter) !== filters.roleId ||
+    (statusFilter === 'ALL' ? undefined : statusFilter) !== filters.status
 
   return (
     <div className="flex flex-col gap-4">
@@ -81,6 +85,7 @@ export function UsersPage() {
         roleFilter={roleFilter}
         assignableRoles={assignableRoles}
         hasFilters={hasFilters}
+        hasPendingChanges={hasPendingChanges}
         onSearchInputChange={setSearchInput}
         onSearchSubmit={applyFilters}
         onStatusFilterChange={setStatusFilter}
@@ -122,8 +127,8 @@ export function UsersPage() {
       )}
 
       <UserDialog
-        key={userToEdit?.id ?? 'new'}
-        state={{ open: dialogOpen, user: userToEdit }}
+        open={dialogOpen}
+        user={userToEdit}
         onClose={() => { setDialogOpen(false); setUserToEdit(undefined) }}
       />
 

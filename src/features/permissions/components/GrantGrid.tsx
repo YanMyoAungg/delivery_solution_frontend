@@ -1,22 +1,22 @@
-import { Square, SquareCheck } from 'lucide-react'
-import { cn } from 'cn'
+import { Square, SquareCheck } from "lucide-react";
+import { cn } from "cn";
 import {
   layoutDefinedKeys,
   type GridLayout,
   type GridRow,
-} from '../grant-grid'
-import { summarizeGrants } from '../grant-logic'
+} from "../grant-grid";
+import { summarizeGrants } from "../grant-logic";
 
 interface GrantGridProps {
-  layout: GridLayout
-  checked: Set<string>
+  layout: GridLayout;
+  checked: Set<string>;
   /** True only when a role is picked, it isn't a system role, and the caller
    * holds `permissions.update`. Otherwise the grid renders read-only marks. */
-  editable: boolean
-  onToggle: (key: string) => void
+  editable: boolean;
+  onToggle: (key: string) => void;
 }
 
-const CELL = 'flex min-h-11 min-w-11 items-center justify-center'
+const CELL = "flex min-h-11 min-w-11 items-center justify-center";
 
 /** Read-only mark — an icon, not a disabled checkbox, so a viewer can tell
  * "you cannot change this" apart from "this is switched off". */
@@ -24,10 +24,10 @@ function ReadOnlyMark({ granted }: { granted: boolean }) {
   return (
     <span
       role="img"
-      aria-label={granted ? 'Granted' : 'Not granted'}
+      aria-label={granted ? "Granted" : "Not granted"}
       className={cn(
         CELL,
-        granted ? 'text-foreground' : 'text-muted-foreground/60',
+        granted ? "text-foreground" : "text-muted-foreground/60",
       )}
     >
       {granted ? (
@@ -36,7 +36,7 @@ function ReadOnlyMark({ granted }: { granted: boolean }) {
         <Square className="size-4" />
       )}
     </span>
-  )
+  );
 }
 
 function EditableMark({
@@ -44,15 +44,15 @@ function EditableMark({
   label,
   onToggle,
 }: {
-  granted: boolean
-  label: string
-  onToggle: () => void
+  granted: boolean;
+  label: string;
+  onToggle: () => void;
 }) {
   return (
     <label
       className={cn(
         CELL,
-        'cursor-pointer rounded-md hover:bg-accent focus-within:ring-2 focus-within:ring-ring',
+        "cursor-pointer rounded-md hover:bg-accent focus-within:ring-2 focus-within:ring-ring",
       )}
     >
       <input
@@ -63,7 +63,7 @@ function EditableMark({
         aria-label={label}
       />
     </label>
-  )
+  );
 }
 
 export function GrantGrid({
@@ -75,7 +75,7 @@ export function GrantGrid({
   const { granted: grantedCount, total: totalCount } = summarizeGrants(
     layoutDefinedKeys(layout),
     checked,
-  )
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -120,7 +120,7 @@ export function GrantGrid({
                   {row.module}
                 </th>
                 {layout.columns.map((action) => {
-                  const cell = row.actions[action]
+                  const cell = row.actions[action];
                   return (
                     <td
                       key={action}
@@ -131,7 +131,7 @@ export function GrantGrid({
                         // stays rectangular and the gap is visible.
                         <span
                           aria-hidden="true"
-                          className={cn(CELL, 'text-muted-foreground/40')}
+                          className={cn(CELL, "text-muted-foreground/40")}
                         >
                           ·
                         </span>
@@ -145,7 +145,7 @@ export function GrantGrid({
                         <ReadOnlyMark granted={checked.has(cell.key)} />
                       )}
                     </td>
-                  )
+                  );
                 })}
               </tr>
             ))}
@@ -153,5 +153,5 @@ export function GrantGrid({
         </table>
       </div>
     </div>
-  )
+  );
 }

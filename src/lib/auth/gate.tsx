@@ -1,13 +1,10 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '@/lib/store/auth.store'
+import { usePermission } from '@/lib/auth/usePermission'
 import type { PermissionKey } from '@/types/permission'
 
-/** Single source of permission truth. Mirrors backend grants (hasPermission). */
-export function usePermission(name: PermissionKey): boolean {
-  return useAuthStore((state) => state.hasPermission(name))
-}
-
+/** Renders `children` only when the caller holds `name`. */
 export function Can({
   name,
   children,

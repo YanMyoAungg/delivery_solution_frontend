@@ -1,12 +1,13 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { toNullableString } from '@/lib/nullable'
-import { formatDate, statusBadgeClass } from '@/lib/utils'
+import { formatDate, badgeClass } from '@/lib/utils'
+import { userStatusTone } from '@/lib/constants/user-status'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import type { UserResponseDto } from '@/types/user'
+import type { components } from '@/types/api'
 
-type User = UserResponseDto
+type User = components['schemas']['UserResponseDto']
 
 interface UsersTableProps {
   users: User[]
@@ -49,7 +50,7 @@ export function UsersTable({ users, canUpdate, currentUser, onEdit, onDelete }: 
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className={statusBadgeClass(user.status)}>
+                  <Badge variant="secondary" className={badgeClass(userStatusTone(user.status))}>
                     {user.status}
                   </Badge>
                 </TableCell>
